@@ -1,4 +1,4 @@
-# Code Context Packer
+# Code Packer
 
 **让 AI 真正读懂你的项目。**
 
