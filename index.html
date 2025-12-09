@@ -5,94 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Packer - AI 项目代码助手</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body>
 
+<div id="toast-container"></div>
+
 <div class="container">
     <header>
-        <h1>Code Packer</h1>
-        <div class="subtitle">让 AI 读懂你的项目 · 让代码交互更顺畅</div>
+        <div class="logo-area">
+            <h1>Code Packer</h1>
+            <span class="tag">AI Context Helper</span>
+        </div>
+        <div class="subtitle">将项目转化为 AI 易读的 Prompt，或将 Prompt 还原为项目</div>
         
         <div class="hero-box">
-            <p>
-                🚀 <strong>为什么需要它？</strong> 将整个项目打包成 AI 可读的单一文本，保留目录结构，自动过滤 node_modules 等文件。
-                <br>
-                🔄 <strong>反向还原：</strong> 支持将 AI 生成的完整代码文本一键还原为项目压缩包。
-            </p>
-            <div class="hero-links">
-                <a href="https://github.com/dozybot001/code_packer" target="_blank">View on GitHub</a>
-                <span class="divider">|</span>
-                <a href="https://dozybot001.github.io/2025/12/09/21_S/" target="_blank">My Blog Website</a>
+            <div class="hero-content">
+                <p>🚀 <strong>提升效率：</strong> 自动过滤无关文件 (node_modules, .git)，生成 Token 友好的结构化文本。</p>
+                <div class="hero-links">
+                    <a href="https://github.com/dozybot001/code_packer" target="_blank" class="link-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        GitHub
+                    </a>
+                    <a href="https://dozybot001.github.io/2025/12/09/21_S/" target="_blank" class="link-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        Blog
+                    </a>
+                </div>
             </div>
         </div>
     </header>
 
+
+
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('pack')">📂 打包 (Code to Text)</button>
-        <button class="tab-btn" onclick="switchTab('unpack')">📦 还原 (Text to Zip)</button>
+        <button class="tab-btn active" onclick="switchTab('pack')">
+            <span class="tab-icon">📂</span> 打包模式 (Pack)
+        </button>
+        <button class="tab-btn" onclick="switchTab('unpack')">
+            <span class="tab-icon">📦</span> 还原模式 (Unpack)
+        </button>
+        <div class="tab-indicator"></div>
     </div>
 
     <div id="packSection" class="section-content active">
-        <div class="upload-zone">
-            <span class="icon-folder">📁</span>
-            <div style="font-size: 1.1rem; font-weight: 500;">点击选择或拖拽项目文件夹</div>
-            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px;">
-                支持 Flutter, Vue, React, Python, Java 等任意项目
+        
+        <div class="upload-zone" id="packZone">
+            <div class="zone-content">
+                <div class="icon-circle">
+                    <span class="icon-folder">📁</span>
+                </div>
+                <div class="zone-text">
+                    <h3>点击选择项目文件夹</h3>
+                    <p>或将文件夹拖拽至此</p>
+                </div>
+                <div class="zone-tags">
+                    <span>Flutter</span><span>Vue</span><span>React</span><span>Python</span><span>Java</span>
+                </div>
             </div>
             <input type="file" id="fileInput" webkitdirectory directory multiple>
         </div>
 
-        <div class="info-panel">
-            <div id="status" class="stats">等待上传...</div>
+        <div class="status-bar-container">
+            <div id="statusCapsule" class="status-capsule idle">
+                <span class="status-icon">✨</span>
+                <span id="statusText">准备就绪，请上传项目</span>
+            </div>
         </div>
 
-        <div id="fileListContainer" class="file-list-container" style="display: none;">
-            <div class="file-list-header">
-                <span>核心文件预览 (可手动剔除)</span>
-                <button class="btn-xs" onclick="toggleAllFiles()">全选/反选</button>
+        <div id="dashboard" class="dashboard-grid" style="display: none;">
+            <div class="stat-card">
+                <span class="stat-label">文件总数</span>
+                <span class="stat-value" id="fileCountVal">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Token 估算</span>
+                <span class="stat-value" id="tokenVal">0</span>
+            </div>
+            <div class="stat-card action-card">
+                 <button class="btn btn-primary" onclick="copyToClipboard()">
+                    <span class="btn-icon">📋</span> 复制到剪贴板
+                </button>
+                <button class="btn btn-secondary" onclick="downloadFile()">
+                    <span class="btn-icon">⬇️</span> 下载文件
+                </button>
+            </div>
+        </div>
+
+        <div id="fileListContainer" class="panel-container" style="display: none;">
+            <div class="panel-header">
+                <span class="panel-title">包含的文件</span>
+                <button class="btn-xs" onclick="toggleAllFiles()">全选 / 反选</button>
             </div>
             <div id="fileList" class="file-list"></div>
         </div>
         
-        <div class="action-bar" id="actionBar">
-            <button class="btn btn-secondary" onclick="copyToClipboard()">📋 复制 Prompt</button>
-            <button class="btn btn-primary" onclick="downloadFile()">⬇️ 下载 .txt</button>
-        </div>
-
-        <div class="preview-container" id="previewContainer">
-            <div class="preview-header">
-                <span>Prompt 预览</span>
-                <span id="tokenEstimate">Token 估算: 0</span>
+        <div class="panel-container" id="previewContainer" style="display: none;">
+            <div class="panel-header">
+                <span class="panel-title">生成的 Prompt 预览</span>
             </div>
-            <pre id="previewArea"></pre>
+            <div class="code-editor-look">
+                <pre id="previewArea"></pre>
+            </div>
         </div>
     </div>
 
     <div id="unpackSection" class="section-content">
-        <div class="upload-zone dashed-zone">
-            <span class="icon-folder">📄</span>
-            <div style="font-size: 1.1rem; font-weight: 500;">拖入 .txt 文件 或 粘贴内容</div>
-            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px;">
-                将 Code Packer 格式的文本还原为 .zip
+        <div class="upload-zone dashed-zone" id="unpackZone">
+            <div class="zone-content">
+                <div class="icon-circle secondary">
+                    <span class="icon-folder">📄</span>
+                </div>
+                <div class="zone-text">
+                    <h3>拖入 .txt 文件</h3>
+                    <p>或在下方直接粘贴内容</p>
+                </div>
             </div>
             <input type="file" id="txtInput" accept=".txt">
         </div>
         
         <div class="textarea-container">
-            <textarea id="pasteArea" placeholder="或者直接在这里粘贴 AI 生成的完整代码文本..."></textarea>
+            <textarea id="pasteArea" placeholder="在此处粘贴 AI 生成的完整代码文本 (包含 '=== File:' 标记)..."></textarea>
         </div>
 
         <div class="guide-box">
-            <strong>💡 提示技巧：</strong> 想要 AI 生成可还原的代码？试试这个 Prompt：
-            <div class="code-snippet" onclick="copyPromptHint()">
-                "请修改代码，并以 Code Packer 格式（包含 Project Structure 和 === File: path === 标记）输出完整的修改后文件内容，不要省略。"
+            <div class="guide-icon">💡</div>
+            <div class="guide-content">
+                <strong>Prompt 技巧：</strong> 要求 AI 按以下格式输出，即可一键还原：
+                <div class="code-snippet" onclick="copyPromptHint()">
+                    "请修改代码，并以 Code Packer 格式（包含 Project Structure 和 === File: path === 标记）输出完整的修改后文件内容，不要省略。"
+                    <span class="copy-hint">点击复制</span>
+                </div>
             </div>
         </div>
 
-        <div class="action-bar" style="display: flex;">
-            <button class="btn btn-primary" onclick="unpackToZip()">⚡️ 生成并下载 .zip</button>
+        <div class="action-bar-center">
+            <button class="btn btn-primary large-btn" onclick="unpackToZip()">
+                <span class="btn-icon">⚡️</span> 解析并下载 Zip
+            </button>
         </div>
     </div>
 

@@ -1,31 +1,32 @@
+// ================= 全局配置 =================
+const CONFIG = {
+    // 忽略的目录
+    IGNORE_DIRS: [
+        '.git', '.svn', '.hg', '.idea', '.vscode', '.settings',
+        'node_modules', 'bower_components', 'build', 'dist', 'out', 'target',
+        '__pycache__', '.venv', 'venv', 'env', '.pytest_cache',
+        '.dart_tool', '.pub-cache', 'bin', 'obj', '.gradle', 'vendor',
+        'tmp', 'temp', 'logs', 'coverage', '.next', '.nuxt',
+        'ios', 'android'
+    ],
+    // 忽略的文件后缀
+    IGNORE_EXTS: [
+        '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.mp4', '.mp3', '.wav',
+        '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.zip', '.tar', '.gz', '.7z', '.rar',
+        '.exe', '.dll', '.so', '.dylib', '.class', '.jar', '.db', '.sqlite', '.sqlite3',
+        '.lock', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', '.DS_Store'
+    ]
+};
+
 // 全局状态
-let globalFiles = []; // 存储 { fileObj, path, selected, content }
+let globalFiles = [];
 let finalOutput = "";
 
-// ================= 配置区域 =================
-const IGNORE_DIRS = [
-    '.git', '.svn', '.hg', '.idea', '.vscode', '.settings',
-    'node_modules', 'bower_components', 'build', 'dist', 'out', 'target',
-    '__pycache__', '.venv', 'venv', 'env', '.pytest_cache',
-    '.dart_tool', '.pub-cache', 'bin', 'obj', '.gradle', 'vendor',
-    'tmp', 'temp', 'logs', 'coverage', '.next', '.nuxt',
-    'ios', 'android' // 常见移动端构建目录也忽略
-];
-
-const IGNORE_EXTS = [
-    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.mp4', '.mp3', '.wav',
-    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.zip', '.tar', '.gz', '.7z', '.rar',
-    '.exe', '.dll', '.so', '.dylib', '.class', '.jar', '.db', '.sqlite', '.sqlite3',
-    '.lock', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', '.DS_Store'
-];
-// ===========================================
-
-// Tab 切换逻辑
+// ================= Tab 切换 =================
 function switchTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
     
-    // 简单通过文本内容匹配按钮 (实际开发建议加 ID)
     const btns = document.querySelectorAll('.tab-btn');
     if(tab === 'pack') {
         btns[0].classList.add('active');
@@ -36,102 +37,75 @@ function switchTab(tab) {
     }
 }
 
-// ----------------------
-// 逻辑 A: Packer (打包)
-// ----------------------
+// ================= 逻辑 A: Packer (打包) =================
 
 document.getElementById('fileInput').addEventListener('change', async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
-    resetPackerUI();
-    updateStatus(`正在分析 ${files.length} 个文件...`, 'processing');
-
-    globalFiles = []; // 重置全局状态
-
-    // 1. 预处理：读取并过滤
-    let processedCount = 0;
+    resetUI();
+    setStatus('processing', '正在分析文件结构...');
     
+    // 稍微延迟一下以显示动画，增加“处理感”
+    await new Promise(r => setTimeout(r, 400));
+    
+    globalFiles = [];
+
     for (const file of files) {
         const path = file.webkitRelativePath || file.name;
-        
-        // 过滤逻辑
         if (shouldIgnore(path)) continue;
 
         try {
-            // 异步读取内容 (为了后面能快速重新生成，这里先读入内存)
-            // 注意：如果项目巨大，这里应该优化为按需读取。但对于一般代码项目，几MB文本在浏览器内存没问题。
             const text = await readFileAsText(file);
-            globalFiles.push({
-                file: file,
-                path: path,
-                content: text,
-                selected: true // 默认选中
-            });
-            processedCount++;
-        } catch (err) {
-            console.warn(`Skipped binary: ${path}`);
-        }
+            globalFiles.push({ file, path, content: text, selected: true });
+        } catch (err) { console.warn(`Skipped binary: ${path}`); }
     }
 
     if (globalFiles.length === 0) {
-        updateStatus("未找到有效代码文件 (全部被过滤)", 'error');
+        setStatus('error', '未找到有效代码文件 (全部被过滤)');
         return;
     }
 
-    // 2. 渲染文件列表
     renderFileList();
-
-    // 3. 生成初始内容
     generateOutput();
 });
 
 function shouldIgnore(path) {
+    path = path.replace(/\\/g, '/'); // 标准化路径
     const parts = path.split('/');
-    // 目录过滤
-    for (let part of parts) {
-        if (IGNORE_DIRS.includes(part)) return true;
-    }
-    // 后缀过滤
-    for (let ext of IGNORE_EXTS) {
-        if (path.toLowerCase().endsWith(ext)) return true;
-    }
+    if (parts.some(p => CONFIG.IGNORE_DIRS.includes(p))) return true;
+    if (CONFIG.IGNORE_EXTS.some(ext => path.toLowerCase().endsWith(ext))) return true;
     return false;
 }
 
 function renderFileList() {
     const container = document.getElementById('fileList');
-    const wrapper = document.getElementById('fileListContainer');
-    wrapper.style.display = 'block';
+    document.getElementById('fileListContainer').style.display = 'block';
     container.innerHTML = '';
 
     globalFiles.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'file-item';
+        // 简单的文件图标逻辑
+        const icon = item.path.includes('/') ? '📄' : '📝';
+        
         div.innerHTML = `
             <input type="checkbox" id="f_${index}" ${item.selected ? 'checked' : ''}>
+            <span style="margin-right:8px; opacity:0.7">${icon}</span>
             <label for="f_${index}" style="cursor:pointer; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                 ${item.path}
             </label>
         `;
-        
-        // 绑定事件
-        const checkbox = div.querySelector('input');
-        checkbox.addEventListener('change', (e) => {
+        div.querySelector('input').addEventListener('change', (e) => {
             globalFiles[index].selected = e.target.checked;
-            // 样式更新
-            if(!e.target.checked) div.classList.add('ignored');
-            else div.classList.remove('ignored');
-            // 重新生成
+            e.target.checked ? div.classList.remove('ignored') : div.classList.add('ignored');
             generateOutput();
         });
-
         container.appendChild(div);
     });
 }
 
 function toggleAllFiles() {
-    // 简单的全选/反选逻辑：如果有一个没选，就全选；否则全不选
     const hasUnchecked = globalFiles.some(f => !f.selected);
     globalFiles.forEach(f => f.selected = hasUnchecked);
     renderFileList();
@@ -141,168 +115,210 @@ function toggleAllFiles() {
 function generateOutput() {
     const activeFiles = globalFiles.filter(f => f.selected);
     
-    // 1. 生成树
-    let treeString = "Project Structure:\n";
+    // 生成树结构
     const paths = activeFiles.map(f => f.path);
-    treeString += generateTree(paths);
-    treeString += "\n\n================================================\n\n";
+    let result = "Project Structure:\n" + generateTree(paths) + "\n\n================================================\n\n";
 
-    // 2. 拼接内容
-    let contentString = "";
+    // 拼接内容
     activeFiles.forEach(f => {
-        contentString += `=== File: ${f.path} ===\n`;
-        contentString += f.content;
-        contentString += `\n\n`;
+        const cleanPath = f.path.replace(/\\/g, '/');
+        result += `=== File: ${cleanPath} ===\n${f.content}\n\n`;
     });
 
-    finalOutput = treeString + contentString;
-
+    finalOutput = result;
+    
     // UI 更新
-    document.getElementById('actionBar').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'grid';
     document.getElementById('previewContainer').style.display = 'block';
     
-    const previewText = finalOutput.length > 3000 
-        ? finalOutput.substring(0, 3000) + "\n... (内容过长，请下载查看完整版)" 
-        : finalOutput;
+    const previewText = finalOutput.length > 3000 ? finalOutput.substring(0, 3000) + "\n... (内容过长，仅显示预览)" : finalOutput;
     document.getElementById('previewArea').innerText = previewText;
-
-    const tokenCount = Math.ceil(finalOutput.length / 4);
-    document.getElementById('tokenEstimate').innerText = `Token 估算: ~${tokenCount.toLocaleString()}`;
     
-    updateStatus(`✅ 已打包 ${activeFiles.length} 个文件，大小 ${(finalOutput.length/1024).toFixed(1)} KB`, 'success');
+    // 更新统计数据
+    const tokenEst = Math.ceil(finalOutput.length / 4).toLocaleString();
+    animateValue('fileCountVal', 0, activeFiles.length, 500);
+    document.getElementById('tokenVal').innerText = `~${tokenEst}`;
+    
+    setStatus('success', `✅ 已成功打包 ${activeFiles.length} 个文件`);
 }
 
-// ----------------------
-// 逻辑 B: Unpacker (解包)
-// ----------------------
+// ================= 逻辑 B: Unpacker =================
 
-// 处理 .txt 文件上传
 document.getElementById('txtInput').addEventListener('change', async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-    const text = await readFileAsText(file);
-    document.getElementById('pasteArea').value = text;
+    if (file) {
+        document.getElementById('pasteArea').value = await readFileAsText(file);
+        showToast("文件已读取", "success");
+    }
 });
 
-// 复制提示词
 function copyPromptHint() {
     const text = "请修改代码，并以 Code Packer 格式（包含 Project Structure 和 === File: path === 标记）输出完整的修改后文件内容，不要省略。";
     navigator.clipboard.writeText(text);
-    alert("提示词已复制！粘贴给 AI 即可。");
+    showToast("Prompt 已复制！", "success");
 }
 
 async function unpackToZip() {
     const content = document.getElementById('pasteArea').value;
-    if (!content.trim()) {
-        alert("请先上传文件或粘贴内容！");
-        return;
+    if (!content.trim()) { 
+        showToast("内容为空，请先粘贴代码", "error"); 
+        return; 
     }
+
+    const btn = document.querySelector('.large-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="status-icon">⏳</span> 解析中...';
 
     const zip = new JSZip();
     let fileCount = 0;
 
-    // 解析逻辑：根据 === File: path === 分割
-    // 正则解释：匹配 === File: (路径) ===，然后捕获直到下一个标记前的所有内容
-    // 使用 split 更安全
-    const parts = content.split(/=== File: (.*?) ===/);
+    // --- 核心解析逻辑 ---
+    const markerRegex = /(?:\r?\n|^)=== File: (.*?) ===(?:\r?\n|$)/g;
     
-    // split 后数组结构：[前导文案, 路径1, 内容1, 路径2, 内容2, ...]
-    // 所以从索引 1 开始遍历，每次跳2格
-    for (let i = 1; i < parts.length; i += 2) {
-        const filepath = parts[i].trim();
-        let fileContent = parts[i+1];
-        
-        // 清理内容首尾的换行（保留原本的代码缩进，只去首尾多余的空行）
-        // 通常 Packer 生成时会在末尾加 \n\n，这里稍微清理一下
-        fileContent = fileContent.replace(/^\n+/, '').replace(/\n+$/, '');
+    let match;
+    let matches = [];
 
-        if (filepath && filepath.length > 0) {
-            zip.file(filepath, fileContent);
-            fileCount++;
-        }
+    while ((match = markerRegex.exec(content)) !== null) {
+        matches.push({
+            path: match[1].trim(),
+            startIndex: match.index,
+            endIndex: match.index + match[0].length
+        });
     }
 
-    if (fileCount === 0) {
-        alert("未识别到有效的文件标记！请确认文本包含 '=== File: path/to/file ===' 格式。");
+    if (matches.length === 0) {
+        alert("未找到有效的文件标记！格式应为：=== File: path/to/file.ext ===");
+        btn.innerHTML = originalText;
         return;
     }
 
-    // 生成并下载
-    const blob = await zip.generateAsync({type:"blob"});
-    saveAs(blob, "project_unpacked.zip");
+    for (let i = 0; i < matches.length; i++) {
+        const current = matches[i];
+        const next = matches[i + 1];
+        const contentStart = current.endIndex;
+        const contentEnd = next ? next.startIndex : content.length;
+
+        let rawContent = content.substring(contentStart, contentEnd);
+        let cleanPath = current.path.replace(/\\/g, '/').replace(/^(\.\/|\/)/, '');
+
+        if (!cleanPath || cleanPath.endsWith('/')) continue;
+
+        rawContent = rawContent.replace(/^\s*[\r\n]/, '').replace(/[\r\n]\s*$/, '');
+        zip.file(cleanPath, rawContent);
+        fileCount++;
+    }
+
+    if (fileCount > 0) {
+        try {
+            const blob = await zip.generateAsync({type:"blob"});
+            saveAs(blob, "project_unpacked.zip");
+            showToast(`成功还原 ${fileCount} 个文件`, "success");
+        } catch (e) {
+            console.error(e);
+            showToast("Zip 生成失败: " + e.message, "error");
+        }
+    } else {
+        showToast("未提取到任何有效文件", "error");
+    }
+    
+    btn.innerHTML = originalText;
 }
 
-// ----------------------
-// 工具函数
-// ----------------------
-function resetPackerUI() {
-    document.getElementById('actionBar').style.display = 'none';
+// ================= UI 工具函数 =================
+
+function resetUI() {
+    document.getElementById('dashboard').style.display = 'none';
     document.getElementById('previewContainer').style.display = 'none';
     document.getElementById('fileListContainer').style.display = 'none';
     finalOutput = "";
+    // 重置状态栏
+    const cap = document.getElementById('statusCapsule');
+    cap.className = 'status-capsule idle';
+    document.getElementById('statusText').innerText = '准备就绪';
 }
 
-function updateStatus(msg, type) {
-    const el = document.getElementById('status');
-    el.innerText = msg;
-    el.style.color = type === 'error' ? '#ff5546' : (type === 'success' ? '#81c995' : '#a8abb1');
+function setStatus(type, msg) {
+    const cap = document.getElementById('statusCapsule');
+    const txt = document.getElementById('statusText');
+    const icon = cap.querySelector('.status-icon');
+    
+    cap.className = 'status-capsule ' + type;
+    txt.innerText = msg;
+    
+    if(type === 'processing') icon.innerText = '⏳';
+    else if(type === 'success') icon.innerText = '🎉';
+    else if(type === 'error') icon.innerText = '❌';
+    else icon.innerText = '✨';
+}
+
+function showToast(msg, type = 'normal') {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = type === 'success' ? `<span>✅</span> ${msg}` : (type === 'error' ? `<span>⚠️</span> ${msg}` : msg);
+    
+    container.appendChild(el);
+    setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-20px)';
+        setTimeout(() => el.remove(), 300);
+    }, 3000);
+}
+
+// 数字滚动动画
+function animateValue(id, start, end, duration) {
+    if (start === end) return;
+    const range = end - start;
+    let current = start;
+    const increment = end > start ? 1 : -1;
+    const stepTime = Math.abs(Math.floor(duration / range));
+    const obj = document.getElementById(id);
+    
+    const timer = setInterval(function() {
+        current += increment;
+        obj.innerHTML = current;
+        if (current == end) {
+            clearInterval(timer);
+        }
+    }, Math.max(stepTime, 20)); // 最快20ms一帧
 }
 
 function readFileAsText(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject(e);
+        reader.onerror = reject;
         reader.readAsText(file);
     });
 }
 
 function downloadFile() {
     const blob = new Blob([finalOutput], { type: 'text/plain' });
-    saveAs(blob, "project_context.txt"); // 使用 FileSaver.js
+    saveAs(blob, "project_context.txt");
+    showToast("文件下载已开始", "success");
 }
 
 async function copyToClipboard() {
     try {
         await navigator.clipboard.writeText(finalOutput);
-        const btn = document.querySelector('.btn-secondary'); // 注意：如果有多个btn-secondary，这里要改具体点
-        const originalText = btn.innerHTML;
-        btn.innerHTML = "✅ 已复制";
-        setTimeout(() => btn.innerHTML = originalText, 2000);
-    } catch (err) {
-        alert('复制失败，文本太长，请使用下载功能。');
-    }
+        showToast("已复制到剪贴板！", "success");
+    } catch (e) { showToast('复制失败，请尝试下载文件', 'error'); }
 }
 
-// 树结构生成算法 (保持原样，稍作封装)
 function generateTree(paths) {
     let tree = {};
     paths.forEach(path => {
-        let parts = path.split('/');
-        let current = tree;
-        parts.forEach(part => {
-            current[part] = current[part] || {};
-            current = current[part];
-        });
+        path.replace(/\\/g, '/').split('/').reduce((r, k) => r[k] = r[k] || {}, tree);
     });
-
-    function printTree(node, prefix = "") {
-        let output = "";
+    
+    function print(node, prefix = "") {
         let keys = Object.keys(node);
-        keys.forEach((key, index) => {
-            let isLast = index === keys.length - 1;
-            let connector = isLast ? "└── " : "├── ";
-            if (Object.keys(node[key]).length === 0) {
-                output += prefix + connector + key + "\n";
-            } else {
-                output += prefix + connector + key + "/\n";
-                output += printTree(node[key], prefix + (isLast ? "    " : "│   "));
-            }
-        });
-        return output;
+        return keys.map((key, i) => {
+            let last = i === keys.length - 1;
+            let str = prefix + (last ? "└── " : "├── ") + key + "\n";
+            if (Object.keys(node[key]).length) str += print(node[key], prefix + (last ? "    " : "│   "));
+            return str;
+        }).join('');
     }
-    let rootKey = Object.keys(tree)[0];
-    // 如果是多文件夹上传或根目录，可能没有统一rootKey，简单处理
-    if(!rootKey) return "";
-    return (paths.length > 1 ? "Root/\n" : "") + printTree(tree);
+    return Object.keys(tree).length ? (paths.length > 1 ? "Root/\n" : "") + print(tree) : "";
 }
