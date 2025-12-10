@@ -153,7 +153,7 @@ document.getElementById('txtInput').addEventListener('change', async (e) => {
 });
 
 function copyPromptHint() {
-    const text = "请修改代码，并以 Code Packer 格式（包含 Project Structure 和 === File: path === 标记）输出完整的修改后文件内容，不要省略。";
+    const text = "请修改代码，并以 Project Packer 格式（包含 Project Structure 和 === File: path === 标记）输出完整的修改后文件内容，不要省略。";
     navigator.clipboard.writeText(text);
     showToast("Prompt 已复制！", "success");
 }
