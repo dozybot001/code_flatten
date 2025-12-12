@@ -161,18 +161,24 @@ document.getElementById('txtInput').addEventListener('change', async (e) => {
     }
 });
 
+// 复制防转义 Prompt
 function copyPromptHint() {
-    // 使用反引号 ` (键盘 Esc 键下方) 来包裹多行文本
-    const text = `请修改代码，并严格按照 Project Packer 格式输出（包含 Project Structure 和 === File: path === 标记）。
+    // 1. 获取 HTML 元素
+    const promptElement = document.getElementById('promptText');
+    
+    if (!promptElement) {
+        console.error("Prompt element not found!");
+        return;
+    }
 
-⚠️ 重要格式要求：
-1. 请直接输出【纯文本 (Raw Text)】，严禁将代码包裹在 JSON 字符串或对其进行转义处理。
-2. 不要将换行符写成 \\n，不要将引号写成 \\"，请保留原始的代码换行和缩进。
-3. 确保输出完整，不要省略任何文件内容。`;
+    // 2. 获取文本内容 (innerText 会自动保留 HTML 中的换行)
+    const text = promptElement.innerText;
 
+    // 3. 写入剪贴板
     navigator.clipboard.writeText(text);
     showToast("Prompt 已复制！", "success");
 }
+
 async function unpackToZip() {
     const content = document.getElementById('pasteArea').value;
     if (!content.trim()) { 
@@ -595,4 +601,33 @@ function clearHistory() {
         renderHistory();
         showToast("历史记录已清空", "success");
     }
+}
+
+// ================= 新增：格式清洗工具 =================
+
+function cleanEscapedText() {
+    const area = document.getElementById('pasteArea');
+    let text = area.value;
+
+    if (!text) {
+        showToast("请先粘贴内容", "error");
+        return;
+    }
+
+    // 1. 尝试去除首尾可能存在的包裹引号
+    // 很多时候 AI 会把整个内容包在 "..." 里面
+    if (text.trim().startsWith('"') && text.trim().endsWith('"')) {
+        text = text.trim().slice(1, -1);
+    }
+
+    // 2. 核心清洗逻辑：将字面意义的转义符替换为真实字符
+    // replace(/\\n/g, '\n') 意思是：找到所有的 \n 字符，变成真正的换行
+    text = text
+        .replace(/\\n/g, '\n')  // 修复换行
+        .replace(/\\"/g, '"')   // 修复双引号
+        .replace(/\\t/g, '\t')  // 修复缩进
+        .replace(/\\\\/g, '\\'); // 修复反斜杠本身
+
+    area.value = text;
+    showToast("格式已修复！斜杠已去除", "success");
 }
