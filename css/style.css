@@ -159,7 +159,7 @@ h1 {
 .unified-height-upload { height: 200px; box-sizing: border-box; }
 .unified-height-main { height: 250px; box-sizing: border-box; }
 .unified-height-preview { height: 300px; box-sizing: border-box; }
-.unified-height-prompt { height: 125px; box-sizing: border-box; }
+.unified-height-prompt { height: 150px; box-sizing: border-box; }
 
 .btn {
     border: none;
