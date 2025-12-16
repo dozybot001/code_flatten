@@ -26,7 +26,8 @@ class ProjectProcessor {
             for (const { rule, isDir } of this.gitIgnoreRules) {
                 if (parts.includes(rule)) return true;
                 if (rule.includes('/')) {
-                    const normalizedRule = rule.startsWith('/') ? rule.slice(1) : rule;
+                    const normalizedRule = rule.startsWith('/') ?
+                        rule.slice(1) : rule;
                     if (path === normalizedRule || 
                         path.startsWith(normalizedRule + '/') || 
                         path.includes('/' + normalizedRule + '/')) {
@@ -66,7 +67,7 @@ class ProjectProcessor {
         return Object.keys(tree).length ? (paths.length > 1 ? "Root/\n" : "") + print(tree) : "";
     }
 
-    async restoreFilesFromText(content, originalName = "code_flatten_restored") {
+    async restoreFilesFromText(content, originalName = "forge_restored") {
         const markerRegex = /(?:^|\r?\n)[=-]{3,}\s*File:\s*(.*?)\s*[=-]{3,}(?:\r?\n|$)/g;
         const zip = new JSZip();
         let fileCount = 0;

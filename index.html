@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Flatten & Prompt Amplifier</title>
+    <title>AIchemy - Cast, Forge & Refine</title>
     
     <link rel="stylesheet" type="text/css" href="global/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -36,15 +36,20 @@
     </div>
 
     <div id="rightNavContainer">
-        <div class="nav-bookmark" onclick="switchMainView('amplifier')" id="bm-amplifier">
+        <div class="nav-bookmark" onclick="switchMainView('cast')" id="bm-cast">
             <span class="bookmark-arrow">➜</span>
-            <span class="bookmark-text">Prompt Amplifier</span>
+            <span class="bookmark-text">Cast</span>
             <span class="bookmark-icon">🚀</span>
         </div>
-        <div class="nav-bookmark active" onclick="switchMainView('flatten')" id="bm-flatten">
+        <div class="nav-bookmark active" onclick="switchMainView('forge')" id="bm-forge">
             <span class="bookmark-arrow">➜</span>
-            <span class="bookmark-text">Code Flatten</span>
-            <span class="bookmark-icon">🥞</span>
+            <span class="bookmark-text">Forge</span>
+            <span class="bookmark-icon">⚒️</span>
+        </div>
+        <div class="nav-bookmark" onclick="switchMainView('refine')" id="bm-refine">
+            <span class="bookmark-arrow">➜</span>
+            <span class="bookmark-text">Refine</span>
+            <span class="bookmark-icon">✨</span>
         </div>
     </div>
 
@@ -52,14 +57,14 @@
 
     <div id="viewSlider">
         
-        <div class="page-section" id="page-amplifier">
+        <div class="page-section" id="page-cast">
             <div class="container empty-frame">
                 <header>
                     <div class="header-row">
                         <div class="logo-area">
                             <div class="logo-wrapper">
-                                <h1>Prompt Amplifier</h1>
-                                <span class="silver-tag">AI Enhancer</span>
+                                <h1>Cast</h1>
+                                <span class="silver-tag">Prompt Engine</span>
                             </div>
                         </div>
                     </div>
@@ -76,15 +81,14 @@
             </div>
         </div>
 
-        <div class="page-section" id="page-flatten">
+        <div class="page-section" id="page-forge">
             <div class="container" id="mainContainer">
-                
                 <header>
                     <div class="header-row">
                         <div class="logo-area">
                             <div class="logo-wrapper">
-                                <h1>Code Flatten</h1>
-                                <span class="silver-tag">For AI Context</span>
+                                <h1>Forge</h1>
+                                <span class="silver-tag">Context Builder</span>
                             </div>
                         </div>
                         
@@ -96,7 +100,7 @@
                         </div>
                     </div>
 
-                    <div class="subtitle">将立体项目<strong>“压扁”</strong>成 AI 上下文，或将生成文本<strong>“重构”</strong>为项目代码。<span class="btn-suffix">Flatten & Inflate.</span></div>
+                    <div class="subtitle">将立体项目<strong>“熔炼”</strong>成 AI 上下文，或将生成文本<strong>“重塑”</strong>为项目代码。<span class="btn-suffix">Smelt & Remold.</span></div>
                     
                     <div class="hero-box">
                         <div class="hero-content">
@@ -111,17 +115,16 @@
                 </header>
 
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="switchTab('pack')">
-                        <span class="tab-icon">🥞</span> 压扁<span class="btn-suffix">Flatten</span>
+                    <button class="tab-btn active" onclick="switchTab('smelt')">
+                        <span class="tab-icon">🔥</span> 熔炼<span class="btn-suffix">Smelt</span>
                     </button>
-                    <button class="tab-btn" onclick="switchTab('inflate')">
-                        <span class="tab-icon">🏗️</span> 重构<span class="btn-suffix">Inflate</span>
+                    <button class="tab-btn" onclick="switchTab('remold')">
+                        <span class="tab-icon">🏗️</span> 重塑<span class="btn-suffix">Remold</span>
                     </button>
                     <div class="tab-indicator"></div>
                 </div>
 
-                <div id="packSection" class="section-content active">
-                    
+                <div id="smeltSection" class="section-content active">
                     <div class="upload-zone unified-height-upload" id="packZone">
                         <div class="zone-content">
                             <div class="icon-circle">
@@ -175,8 +178,8 @@
                     </div>
 
                     <div class="action-bar-center mb-24">
-                        <button class="btn btn-primary large-btn" onclick="doFlatten()">
-                            <span class="btn-icon">🥞</span> 压扁 <span class="btn-suffix">Flatten</span>
+                        <button class="btn btn-primary large-btn" onclick="doSmelt()">
+                            <span class="btn-icon">🔥</span> 熔炼 <span class="btn-suffix">Smelt</span>
                         </button>
                         <button class="btn btn-primary" onclick="downloadFile()">
                             <span class="btn-icon">⬇️</span> 下载 <span class="btn-suffix">Download</span>
@@ -198,41 +201,16 @@
                     <div class="guide-box unified-height-prompt">
                         <div class="guide-content">
                             <span class="panel-title">💡 点击复制提示词<span class="btn-suffix">Prompt</span></span>
-                            <div class="code-snippet" onclick="copyPromptHint()"><span id="promptText"># Role
-你是一个代码重构引擎。你的任务是读取提供的 txt 文本理解项目结构与代码逻辑，并根据用户的修改要求生成一个新的项目快照。
-
-# Critical Output Rules (至关重要)
-1. **必须使用代码块**：你输出的所有内容（包含目录树和所有文件代码）必须**严格**包裹在一个 txt 代码块中（```txt ... ```）。
-2. **禁止渲染**：绝对不要在 txt 代码块之外输出任何项目内容。不要使用 Markdown 渲染文件路径（如不要加粗）。
-3. **格式完整性**：这是为了机器解析，请保持原始缩进和换行符，不要截断代码。
-
-# Format Template
-请完全遵循以下格式输出，不要改变分隔符样式，示例：
-
-```txt
-Project Structure:
-Root/
-└── ...
-
-================================================
-
-=== File: src/main.js ===
-// 这里是文件的完整代码...
-
-=== File: src/style.css ===
-/* 这里是文件的完整代码... */
-
-```
-# 修改要求：
-1. 
-</span></div>
+                            <div class="code-snippet" onclick="copyPromptHint()">
+                                <span id="promptText" style="color: var(--text-tertiary);">⏳ 正在加载提示词模板...</span>
+                                <span class="copy-hint">Click to Copy</span>
+                            </div>
+                            <div class="guide-note">将此提示词配合上方生成的项目快照投喂给 AI。</div>
                         </div>
                     </div>
-
                 </div>
 
-                <div id="inflateSection" class="section-content">
-                    
+                <div id="remoldSection" class="section-content">
                     <div class="upload-zone dashed-zone unified-height-upload" id="inflateZone">
                         <div class="zone-content">
                             <div class="icon-circle secondary">
@@ -270,19 +248,43 @@ Root/
                     </div>
 
                     <div class="action-bar-center mb-24">
-                        <button class="btn btn-primary large-btn" onclick="inflateToZip()">
-                            <span class="btn-icon">🏗️</span>重构<span class="btn-suffix">Inflate</span>
+                        <button class="btn btn-primary large-btn" onclick="remoldToZip()">
+                            <span class="btn-icon">🏗️</span>重塑<span class="btn-suffix">Remold</span>
                         </button>
                     </div>
-                    
                 </div>
             </div>
         </div>
+
+        <div class="page-section" id="page-refine">
+            <div class="container empty-frame">
+                <header>
+                    <div class="header-row">
+                        <div class="logo-area">
+                            <div class="logo-wrapper">
+                                <h1>Refine</h1>
+                                <span class="silver-tag">Code Polisher</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="subtitle">Polish & Perfect your codebase for <strong>Ultimate</strong> quality.<span class="btn-suffix">Analyze & Fix.</span></div>
+                </header>
+                
+                <div class="placeholder-content">
+                    <div class="icon-circle secondary">
+                        <span class="icon-folder">🚧</span>
+                    </div>
+                    <h3>Coming Soon</h3>
+                    <p>Refinement tools are being developed.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script type="text/javascript" src="global/js/nav.js"></script>
-    <script type="text/javascript" src="code_flatten/js/config.js"></script>
-    <script type="text/javascript" src="code_flatten/js/core.js"></script>
-    <script type="text/javascript" src="code_flatten/js/app.js"></script>
+    <script type="text/javascript" src="forge/js/config.js"></script>
+    <script type="text/javascript" src="forge/js/core.js"></script>
+    <script type="text/javascript" src="forge/js/app.js"></script>
 </body>
 </html>

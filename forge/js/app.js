@@ -3,12 +3,13 @@ const PROCESSOR = new ProjectProcessor();
 const STATE = {
     globalFiles: [],
     finalOutput: "",
-    currentProjectName: "code_flatten_context",
+    currentProjectName: "forge_context",
     readmeLoaded: false
 };
 document.addEventListener('DOMContentLoaded', () => {
     setupDragAndDrop();
     setupNativeInputs();
+    loadPromptTemplate();
 });
 function setupDragAndDrop() {
     const packZone = document.getElementById('packZone');
@@ -147,7 +148,7 @@ function setupNativeInputs() {
             renderFileTree();
             updateCapsuleStats();
             showToast(`已追加 ${addedCount} 个文件`, "success");
-            if (STATE.currentProjectName === "code_flatten_context" && files.length > 0) {
+            if (STATE.currentProjectName === "forge_context" && files.length > 0) {
                  STATE.currentProjectName = "Mixed_Files";
             }
             resetResultsArea();
@@ -163,7 +164,27 @@ function setupNativeInputs() {
     });
 }
 
-function doFlatten() {
+async function loadPromptTemplate() {
+    const promptElement = document.getElementById('promptText');
+    if (!promptElement) return;
+    try {
+        const response = await fetch('forge/assets/prompt_template.txt');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const text = await response.text();
+        promptElement.innerText = text;
+        promptElement.style.color = '';
+        
+    } catch (error) {
+        console.error("Failed to load prompt template:", error);
+        promptElement.innerText = "// ⚠️ 提示词加载失败，请检查文件路径或网络连接。";
+        promptElement.style.color = '#ef4444';
+    }
+}
+
+function doSmelt() {
     const activeFiles = STATE.globalFiles.filter(f => f.selected);
     if (activeFiles.length === 0) {
         showToast('请至少选择一个文件', 'error');
@@ -191,28 +212,28 @@ function doFlatten() {
         previewArea.innerText = previewText;
 
         await minWait;
-        showToast(`已成功压扁 ${activeFiles.length} 个文件`, 'success');
+        showToast(`已成功熔炼 ${activeFiles.length} 个文件`, 'success');
         showLoading(false);
     }, 50);
 }
 
-async function inflateToZip() {
+async function remoldToZip() {
     const content = document.getElementById('pasteArea').value;
     if (!content.trim()) { 
         showToast("内容为空，请先粘贴代码", "error"); 
         return;
     }
 
-    const btn = document.querySelector('#inflateSection .large-btn');
+    const btn = document.querySelector('#remoldSection .large-btn');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="status-icon">⏳</span> 正在熔铸...';
+    btn.innerHTML = '<span class="status-icon">⏳</span> 正在重塑...';
     try {
         const { blob, fileCount, extractedName } = await PROCESSOR.restoreFilesFromText(content);
         const timeStr = generateTimeStr(new Date());
         const zipFileName = `${extractedName}_${timeStr}.zip`;
 
         saveAs(blob, zipFileName);
-        showToast(`成功还原 ${fileCount} 个文件`, "success");
+        showToast(`成功重塑 ${fileCount} 个文件`, "success");
     } catch (e) {
         console.error(e);
         showToast("Zip 生成失败: " + e.message, "error");
@@ -242,7 +263,6 @@ function renderFileTree() {
                 currentLevel = currentLevel[part]._children;
              }
         });
-    
     });
     Object.keys(treeRoot).forEach(key => {
         const rootNode = treeRoot[key];
@@ -259,7 +279,8 @@ function createTreeNode(node) {
         div.innerHTML = `
             <span class="leaf-icon">📄</span>
             <span class="leaf-name">${node._name}</span>
-            ${!fileData.selected ? '' : '<span class="status-dot"></span>'}
+            ${!fileData.selected ?
+            '' : '<span class="status-dot"></span>'}
         `;
         div.onclick = () => toggleFileSelection(node._index, div);
         return div;
@@ -351,12 +372,12 @@ function switchTab(tab) {
     document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
     
     const btns = document.querySelectorAll('.tab-btn');
-    if(tab === 'pack') {
+    if(tab === 'smelt') {
         btns[0].classList.add('active');
-        document.getElementById('packSection').classList.add('active');
+        document.getElementById('smeltSection').classList.add('active');
     } else {
         btns[1].classList.add('active');
-        document.getElementById('inflateSection').classList.add('active');
+        document.getElementById('remoldSection').classList.add('active');
     }
 }
 

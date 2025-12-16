@@ -28,10 +28,10 @@ body {
     background-color: var(--bg-color);
     color: var(--text-primary);
     font-family: var(--font-ui);
-    margin: 0; padding: 0; /* Remove padding as we use slider now */
-    display: block; /* Changed from flex center for sliding layout */
+    margin: 0; padding: 0; 
+    display: block;
     height: 100vh;
-    overflow: hidden; /* Manage scrolling via slider */
+    overflow: hidden;
     box-sizing: border-box;
     background-image: 
         radial-gradient(circle at 10% 20%, rgba(45, 138, 112, 0.05) 0%, transparent 20%),
@@ -41,11 +41,11 @@ body {
 /* === Layout & Slider Logic === */
 #viewSlider {
     width: 100%;
-    height: 200vh; /* Two full pages height */
+    height: 300vh; /* Three full pages height */
     display: flex;
     flex-direction: column;
     transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    transform: translateY(-50%); /* Default show bottom page (Code Flatten) */
+    transform: translateY(-33.333%); /* Default show middle page (Forge) */
 }
 
 .page-section {
@@ -91,7 +91,8 @@ body {
 
 /* === Right Navigation (Bookmarks) === */
 #rightNavContainer {
-    position: fixed; right: 0; top: 50%; transform: translateY(-50%);
+    position: fixed;
+    right: 0; top: 50%; transform: translateY(-50%);
     display: flex; flex-direction: column; gap: 16px;
     z-index: 50;
 }
@@ -100,7 +101,7 @@ body {
     background: var(--panel-bg);
     border: 1px solid var(--border-subtle);
     border-right: none;
-    padding: 16px 6px; 
+    padding: 16px 6px;
     border-radius: 12px 0 0 12px; 
     cursor: pointer;
     box-shadow: -4px 0 15px rgba(0,0,0,0.3);
@@ -135,12 +136,14 @@ body {
 
 /* === Loading & Common === */
 .loading-overlay {
-    position: fixed; top:0; left:0; width:100%; height:100%;
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
     background: rgba(13, 14, 16, 0.85);
     backdrop-filter: blur(5px);
     z-index: 9999;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    align-items: center;
+    justify-content: center;
     gap: 20px; opacity: 1; transition: opacity 0.3s;
 }
 .loading-overlay.hidden { display: none; opacity: 0; }
@@ -178,7 +181,7 @@ h1 {
 
 .silver-tag {
     position: absolute;
-    bottom: 4px; right: -100px;
+    bottom: 4px; right: -120px;
     background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
     color: #0f172a; font-size: 0.65rem; font-weight: 800;
     padding: 2px 6px;
@@ -207,7 +210,8 @@ h1 {
 .hero-features { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 
 .feature-tag {
-    display: inline-flex; align-items: center; gap: 6px;
+    display: inline-flex; align-items: center;
+    gap: 6px;
     padding: 3px 10px; border-radius: 100px;
     font-size: 0.75rem; line-height: 1.4;
     border: none; background: rgba(255, 255, 255, 0.04);
@@ -267,7 +271,8 @@ h1 {
 }
 .btn-primary { background: var(--accent-primary); color: #fff; box-shadow: 0 4px 12px rgba(45, 138, 112, 0.3); }
 .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(45, 138, 112, 0.4); }
-.btn-secondary { background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid transparent; }
+.btn-secondary { background: rgba(255,255,255,0.05); color: var(--text-primary);
+    border: 1px solid transparent; }
 .btn-secondary:hover { border-color: var(--border-subtle); background: rgba(255,255,255,0.08); }
 
 .tool-btn {
@@ -318,7 +323,8 @@ h1 {
     transform: translateY(-4px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
-.upload-zone input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;}
+.upload-zone input { position: absolute; top: 0;
+    left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;}
 
 .icon-circle {
     width: 64px; height: 64px;
@@ -369,7 +375,8 @@ h1 {
     text-align: center; height: 100%; box-sizing: border-box;
     justify-content: space-between;
 }
-.stats-content-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+.stats-content-wrapper { width: 100%; display: flex;
+    flex-direction: column; align-items: center; margin-top: 20px; }
 .stat-unit-v { display: flex; flex-direction: column; align-items: center; margin-bottom: 16px; }
 .stat-divider-h { width: 30px; height: 1px; background: var(--border-subtle); margin: 12px 0 24px 0; }
 .s-label { font-size: 0.65rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;}
@@ -413,12 +420,15 @@ pre {
     height: 100%; box-sizing: border-box;
 }
 
-.editor-wrapper { background: #0d0e10; position: relative; height: 100%; display: flex; flex-direction: column; }
+.editor-wrapper { background: #0d0e10;
+    position: relative; height: 100%; display: flex; flex-direction: column; }
 .editor-wrapper textarea {
-    width: 100%; flex-grow: 1; background: transparent; border: none;
+    width: 100%; flex-grow: 1; background: transparent;
+    border: none;
     border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 20px;
     color: var(--text-primary); font-family: var(--font-code); font-size: 0.85rem;
-    line-height: 1.6; resize: none; outline: none;
+    line-height: 1.6; resize: none;
+    outline: none;
     box-sizing: border-box; margin: 0; display: block;
 }
 .editor-wrapper textarea::placeholder { color: var(--text-tertiary); opacity: 0.5; }
