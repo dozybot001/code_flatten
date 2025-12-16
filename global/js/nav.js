@@ -8,7 +8,6 @@ function switchMainView(viewName) {
     bmCast.classList.remove('active');
     bmForge.classList.remove('active');
     bmRefine.classList.remove('active');
-
     // Slider container height is 300vh
     // Page 1 (Cast) -> 0%
     // Page 2 (Forge) -> -33.33% (approx -100vh)

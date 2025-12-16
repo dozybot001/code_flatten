@@ -37,21 +37,24 @@ function setupDragAndDrop() {
         const minWait = new Promise(resolve => setTimeout(resolve, 500));
 
         try {
-            const entries = [];
+   
+         const entries = [];
             for (let i = 0; i < items.length; i++) {
                 try {
                     if (typeof items[i].webkitGetAsEntry === 'function') {
-                        const ent = items[i].webkitGetAsEntry();
+                        const 
+ent = items[i].webkitGetAsEntry();
                         if(ent) entries.push(ent);
                     } else if (items[i].kind === 'file') {
                         console.warn("webkitGetAsEntry not supported for item", i);
-                    }
+                  
+  }
                 } catch(e) { console.warn("Skipping item", e); }
             }
 
             if (entries.length > 0) {
                 STATE.currentProjectName = entries[0].name;
-            }
+}
 
             STATE.globalFiles = [];
             const encoding = getEncodingFromDOM();
@@ -94,7 +97,8 @@ function setupNativeInputs() {
         STATE.globalFiles = [];
         const encoding = getEncodingFromDOM();
     
-        if (files.length > 0) {
+      
+  if (files.length > 0) {
             const firstPath = files[0].webkitRelativePath;
             if (firstPath) STATE.currentProjectName = firstPath.split('/')[0];
         }
@@ -102,12 +106,14 @@ function setupNativeInputs() {
         const gitIgnoreFile = files.find(f => f.name === '.gitignore' && (f.webkitRelativePath.split('/').length === 2));
         if (gitIgnoreFile) {
             const text = await readFileAsText(gitIgnoreFile, encoding);
-            PROCESSOR.parseGitIgnore(text);
+     
+       PROCESSOR.parseGitIgnore(text);
         }
     
         const processedList = [];
         for (const file of files) {
-            const path = file.webkitRelativePath || file.name;
+            const path = file.webkitRelativePath ||
+            file.name;
             if (PROCESSOR.shouldIgnore(path)) continue;
             const res = await processSingleFile(file, path, PROCESSOR, encoding);
             if (res) processedList.push(res);
@@ -134,12 +140,14 @@ function setupNativeInputs() {
         for (const file of files) {
             const path = "Extra_Files/" + file.name;
             const existIndex = STATE.globalFiles.findIndex(f => f.path === path);
-            if (existIndex > -1) STATE.globalFiles.splice(existIndex, 1);
+  
+          if (existIndex > -1) STATE.globalFiles.splice(existIndex, 1);
             try {
                 const res = await processSingleFile(file, path, PROCESSOR, encoding);
                 if (res) {
                     STATE.globalFiles.push(res);
-                    addedCount++;
+           
+         addedCount++;
                 }
             } catch (err) { console.warn(`Skipped: ${path}`); }
         }
@@ -147,12 +155,14 @@ function setupNativeInputs() {
         if (addedCount > 0) {
             renderFileTree();
             updateCapsuleStats();
-            showToast(`已追加 ${addedCount} 个文件`, "success");
+            showToast(`已追加 
+
+${addedCount} 个文件`, "success");
             if (STATE.currentProjectName === "forge_context" && files.length > 0) {
                  STATE.currentProjectName = "Mixed_Files";
-            }
+}
             resetResultsArea();
-        }
+}
         e.target.value = '';
     });
     document.getElementById('txtInput').addEventListener('change', (e) => {
@@ -202,7 +212,8 @@ function doSmelt() {
             const cleanPath = f.path.replace(/\\/g, '/');
             result += `=== File: ${cleanPath} ===\n${f.content}\n\n`;
         });
-        
+ 
+       
         STATE.finalOutput = result;
         
         const previewArea = document.getElementById('previewArea');
@@ -212,7 +223,9 @@ function doSmelt() {
         previewArea.innerText = previewText;
 
         await minWait;
-        showToast(`已成功熔炼 ${activeFiles.length} 个文件`, 'success');
+    
+ 
+  showToast(`已成功熔炼 ${activeFiles.length} 个文件`, 'success');
         showLoading(false);
     }, 50);
 }
@@ -257,12 +270,16 @@ function renderFileTree() {
             if (i === parts.length - 1) {
                 currentLevel[part] = { _type: 'file', _index: index, _name: part };
             } else {
-                if (!currentLevel[part]) {
+      
+        
+          if (!currentLevel[part]) {
                     currentLevel[part] = { _type: 'folder', _name: part, _children: {} };
                 }
                 currentLevel = currentLevel[part]._children;
              }
         });
+    
+ 
     });
     Object.keys(treeRoot).forEach(key => {
         const rootNode = treeRoot[key];
@@ -302,7 +319,9 @@ function createTreeNode(node) {
             if (nodeA._type !== nodeB._type) {
                 return nodeA._type === 'folder' ? -1 : 1;
             }
-            return a.localeCompare(b);
+            return 
+
+a.localeCompare(b);
         });
         
         childrenKeys.forEach(key => {
@@ -409,14 +428,20 @@ function triggerAddExtra() {
 async function toggleSidebar() {
     const body = document.body;
     const isOpen = body.classList.contains('sidebar-open');
+    // 获取所有页面中的主容器
+    const containers = document.querySelectorAll('.container');
+
     if (isOpen) {
         body.classList.remove('sidebar-open');
-        document.getElementById('mainContainer').onclick = null;
+        // 移除所有容器的点击监听
+        containers.forEach(el => el.onclick = null);
     } else {
         body.classList.add('sidebar-open');
         setTimeout(() => {
-            document.getElementById('mainContainer').onclick = toggleSidebar;
+            // 给所有容器添加点击监听（点击任意一个都会关闭侧边栏）
+            containers.forEach(el => el.onclick = toggleSidebar);
         }, 100);
+        
         if (!STATE.readmeLoaded) {
             await fetchAndRenderReadme();
         }

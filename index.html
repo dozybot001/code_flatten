@@ -6,7 +6,8 @@
     <title>AIchemy - Cast, Forge & Refine</title>
     
     <link rel="stylesheet" type="text/css" href="global/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" 
+rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown-dark.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -22,6 +23,13 @@
     </div>
 
     <div id="hiddenSidebar">
+        <div id="guideBookmark" onclick="toggleSidebar()">
+            <span class="bookmark-icon">📖</span>
+            <span 
+class="bookmark-text">README</span>
+            <span class="bookmark-arrow">➜</span>
+        </div>
+
         <div class="sidebar-content">
             <div id="readmeContent" class="markdown-body">
                 <div class="loading-spinner">⏳ Loading README...</div>
@@ -29,26 +37,19 @@
         </div>
     </div>
 
-    <div id="guideBookmark" onclick="toggleSidebar()">
-        <span class="bookmark-icon">📖</span>
-        <span class="bookmark-text">README</span>
-        <span class="bookmark-arrow">➜</span>
-    </div>
-
     <div id="rightNavContainer">
-        <div class="nav-bookmark" onclick="switchMainView('cast')" id="bm-cast">
-            <span class="bookmark-arrow">➜</span>
+        
+<div class="nav-bookmark" onclick="switchMainView('cast')" id="bm-cast">
             <span class="bookmark-text">Cast</span>
             <span class="bookmark-icon">🚀</span>
         </div>
         <div class="nav-bookmark active" onclick="switchMainView('forge')" id="bm-forge">
-            <span class="bookmark-arrow">➜</span>
             <span class="bookmark-text">Forge</span>
             <span class="bookmark-icon">⚒️</span>
         </div>
         <div class="nav-bookmark" onclick="switchMainView('refine')" id="bm-refine">
-            <span class="bookmark-arrow">➜</span>
-            <span class="bookmark-text">Refine</span>
+      
+<span class="bookmark-text">Refine</span>
             <span class="bookmark-icon">✨</span>
         </div>
     </div>
@@ -60,24 +61,29 @@
         <div class="page-section" id="page-cast">
             <div class="container empty-frame">
                 <header>
-                    <div class="header-row">
+          
+<div class="header-row">
                         <div class="logo-area">
                             <div class="logo-wrapper">
                                 <h1>Cast</h1>
-                                <span class="silver-tag">Prompt Engine</span>
+   
+<span class="silver-tag">Prompt Engine</span>
                             </div>
                         </div>
-                    </div>
+                 
+</div>
                     <div class="subtitle">Optimize your prompts for <strong>Maximum</strong> reasoning capability.<span class="btn-suffix">Amplify & refine.</span></div>
                 </header>
                 
                 <div class="placeholder-content">
-                    <div class="icon-circle secondary">
+                  
+<div class="icon-circle secondary">
                         <span class="icon-folder">🚧</span>
                     </div>
                     <h3>Coming Soon</h3>
                     <p>New tools are being built here.</p>
-                </div>
+     
+</div>
             </div>
         </div>
 
@@ -85,141 +91,177 @@
             <div class="container" id="mainContainer">
                 <header>
                     <div class="header-row">
-                        <div class="logo-area">
+        
+<div class="logo-area">
                             <div class="logo-wrapper">
                                 <h1>Forge</h1>
-                                <span class="silver-tag">Context Builder</span>
+                      
+<span class="silver-tag">Context Builder</span>
                             </div>
                         </div>
                         
-                        <div class="header-links">
+            
+<div class="header-links">
                             <a href="https://github.com/dozybot001/code_flatten" target="_blank" class="nav-icon-btn" aria-label="GitHub">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 
+1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                             </a>
                             <a href="https://dozybot001.github.io/2025/10/25/5_S/" target="_blank" class="nav-text-btn">Blog</a>
-                        </div>
+   
+</div>
                     </div>
 
                     <div class="subtitle">将立体项目<strong>“熔炼”</strong>成 AI 上下文，或将生成文本<strong>“重塑”</strong>为项目代码。<span class="btn-suffix">Smelt & Remold.</span></div>
                     
-                    <div class="hero-box">
+             
+<div class="hero-box">
                         <div class="hero-content">
                             <div class="hero-features">
-                                <div class="feature-tag orange"><span class="f-icon">🌲</span> 结构映射<span class="btn-suffix">Tree Mapping</span></div>
+                                <div class="feature-tag orange"><span class="f-icon">🌲</span> 结构映射<span class="btn-suffix">Tree 
+Mapping</span></div>
                                 <div class="feature-tag blue"><span class="f-icon">💊</span> 语境胶囊<span class="btn-suffix">Context Capsule</span></div>
                                 <div class="feature-tag green"><span class="f-icon">⚡</span> 无损还原<span class="btn-suffix">Lossless Inflate</span></div>
-                                <div class="feature-tag secondary"><span class="f-icon">🛡️</span> 隐私安全<span class="btn-suffix">Privacy First</span></div>
+                        
+<div class="feature-tag secondary"><span class="f-icon">🛡️</span> 隐私安全<span class="btn-suffix">Privacy First</span></div>
                             </div>
                         </div>
                     </div>
-                </header>
+              
+</header>
 
                 <div class="tabs">
                     <button class="tab-btn active" onclick="switchTab('smelt')">
                         <span class="tab-icon">🔥</span> 熔炼<span class="btn-suffix">Smelt</span>
                     </button>
-                    <button class="tab-btn" onclick="switchTab('remold')">
+           
+<button class="tab-btn" onclick="switchTab('remold')">
                         <span class="tab-icon">🏗️</span> 重塑<span class="btn-suffix">Remold</span>
                     </button>
                     <div class="tab-indicator"></div>
                 </div>
 
-                <div id="smeltSection" class="section-content active">
+     
+<div id="smeltSection" class="section-content active">
                     <div class="upload-zone unified-height-upload" id="packZone">
                         <div class="zone-content">
                             <div class="icon-circle">
-                                <span class="icon-folder">📂</span>
+         
+<span class="icon-folder">📂</span>
                             </div>
                             <div class="zone-text">
-                                <h3>点击或拖拽项目文件夹</h3>
+                   
+<h3>点击或拖拽项目文件夹</h3>
                                 <p>提取目录树与代码，生成 AI 语境快照</p>
                             </div>
-                            <div class="zone-tags">
+                         
+<div class="zone-tags">
                                 <span>Flutter</span><span>Vue</span><span>React</span><span>Python</span><span>Any Code</span>
                             </div>
                         </div>
-                        <input type="file" id="fileInput" webkitdirectory directory multiple>
+           
+<input type="file" id="fileInput" webkitdirectory directory multiple>
                     </div>
 
                     <div class="split-layout unified-height-main">
                         <div class="stats-card">
-                            <div class="stats-icon-footer">📊</div>
+               
+<div class="stats-icon-footer">📊</div>
                             <div class="stats-content-wrapper">
                                 <div class="stat-unit-v">
-                                    <span class="s-label">Files</span>
+                        
+<span class="s-label">Files</span>
                                     <span class="s-value" id="fileCountVal">0</span>
                                 </div>
-                                <div class="stat-divider-h"></div>
+                 
+<div class="stat-divider-h"></div>
                                 <div class="stat-unit-v">
                                     <span class="s-label">Tokens</span>
-                                    <span class="s-value" id="tokenVal">0</span>
+              
+<span class="s-value" id="tokenVal">0</span>
                                 </div>
                             </div>
-                        </div>
+                
+</div>
 
                         <div class="content-column full-height-col">
                             <div id="fileListContainer" class="panel-container full-height-panel">
                                 <div class="panel-header">
-                                    <span class="panel-title">已选文件 <span class="btn-suffix">Tree view</span></span>
+  
+<span class="panel-title">已选文件 <span class="btn-suffix">Tree view</span></span>
                                     <div class="panel-tools"> 
-                                        <select id="encodingSelect" class="tool-select" title="选择文件编码">
+                        
+<select id="encodingSelect" class="tool-select" title="选择文件编码">
                                             <option value="UTF-8" selected>UTF-8</option>
-                                            <option value="GBK">GBK</option>
+                                   
+<option value="GBK">GBK</option>
                                         </select>
                                         <button class="tool-btn" onclick="copyTreeOnly()">🌳 仅复制树<span class="btn-suffix">tree</span></button>
-                                        <button class="tool-btn" onclick="triggerAddExtra()">➕ 补充文件<span class="btn-suffix">supply</span></button>
+      
+<button class="tool-btn" onclick="triggerAddExtra()">➕ 补充文件<span class="btn-suffix">supply</span></button>
                                         <button class="tool-btn" onclick="toggleAllFiles()">☑️ 全选/反选<span class="btn-suffix">select</span></button>
-                                    </div>
+                  
+</div>
                                 </div>
                                 <div id="fileTree" class="tree-container scrollable-tree">
-                                </div>
+               
+</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="action-bar-center mb-24">
+           
+<div class="action-bar-center mb-24">
                         <button class="btn btn-primary large-btn" onclick="doSmelt()">
                             <span class="btn-icon">🔥</span> 熔炼 <span class="btn-suffix">Smelt</span>
                         </button>
-                        <button class="btn btn-primary" onclick="downloadFile()">
+     
+<button class="btn btn-primary" onclick="downloadFile()">
                             <span class="btn-icon">⬇️</span> 下载 <span class="btn-suffix">Download</span>
                         </button>
                     </div>
 
-                    <input type="file" id="extraFileInput" multiple style="display:none">
+  
+<input type="file" id="extraFileInput" multiple style="display:none">
 
                     <div class="panel-container unified-height-preview" id="previewContainer">
                         <div class="panel-header">
-                            <span class="panel-title">👁️ 文本预览<span class="btn-suffix">Top 3000 chars</span></span>
+                            <span class="panel-title">👁️ 
+文本预览<span class="btn-suffix">Top 3000 chars</span></span>
                             <button class="tool-btn" onclick="copyToClipboard()"><span class="btn-icon">📋</span>复制<span class="btn-suffix">Copy</span></button>
                         </div>
                         <div class="code-editor-look">
-                            <pre id="previewArea" placeholder="// 等待处理..."></pre>
+                
+<pre id="previewArea" placeholder="// 等待处理..."></pre>
                         </div>
                     </div>
 
                     <div class="guide-box unified-height-prompt">
-                        <div class="guide-content">
+                   
+<div class="guide-content">
                             <span class="panel-title">💡 点击复制提示词<span class="btn-suffix">Prompt</span></span>
-                            <div class="code-snippet" onclick="copyPromptHint()">
-                                <span id="promptText" style="color: var(--text-tertiary);">⏳ 正在加载提示词模板...</span>
-                                <span class="copy-hint">Click to Copy</span>
+                            <div class="code-snippet" onclick="copyPromptHint()"><span id="promptText" style="color: var(--text-tertiary);">⏳ 正在加载提示词模板...</span>
+                             
+<span class="copy-hint">Click to Copy</span>
                             </div>
                             <div class="guide-note">将此提示词配合上方生成的项目快照投喂给 AI。</div>
                         </div>
-                    </div>
+            
+</div>
                 </div>
 
                 <div id="remoldSection" class="section-content">
                     <div class="upload-zone dashed-zone unified-height-upload" id="inflateZone">
                         <div class="zone-content">
-                            <div class="icon-circle secondary">
+         
+<div class="icon-circle secondary">
                                 <span class="icon-folder">📄</span>
                             </div>
-                            <div class="zone-text">
+                  
+<div class="zone-text">
                                 <h3>上传或拖入 AI 生成的文本文件</h3>
                                 <p>支持 .txt, .md 或直接粘贴</p>
-                            </div>
+                    
+</div>
                         </div>
                         <input type="file" id="txtInput" accept=".txt, .md">
                     </div>
@@ -227,32 +269,40 @@
                     <div class="panel-container mb-24 unified-height-preview">
                         <div class="panel-header">
                             <div class="title-group">
-                                <span class="panel-title">📄 粘贴文本<span class="btn-suffix">Paste Here</span></span>
+                       
+<span class="panel-title">📄 粘贴文本<span class="btn-suffix">Paste Here</span></span>
                             </div>
                             <div class="panel-tools">
-                                <button class="tool-btn" onclick="document.getElementById('txtInput').click()" title="上传文件">
+                              
+<button class="tool-btn" onclick="document.getElementById('txtInput').click()" title="上传文件">
                                     <span class="btn-icon">📂</span>导入 TXT<span class="btn-suffix">upload</span>
                                 </button>
-                                <button class="tool-btn" onclick="cleanEscapedText()" title="自动修复乱码">
+                        
+<button class="tool-btn" onclick="cleanEscapedText()" title="自动修复乱码">
                                     <span class="btn-icon">🧹</span>修复格式<span class="btn-suffix">fix</span>
                                 </button>
-                                <button class="tool-btn" onclick="clearPasteArea()" title="清空内容">
+                   
+<button class="tool-btn" onclick="clearPasteArea()" title="清空内容">
                                     <span class="btn-icon">🗑️</span>清空内容<span class="btn-suffix">clear</span>
                                 </button>
-                            </div>
+              
+</div>
                         </div>
                         
                         <div class="editor-wrapper full-height-col">
-                            <textarea id="pasteArea" placeholder="// 请在此粘贴 AI 生成的代码文本...&#10;// 格式示例：&#10;// === File: src/main.js ===&#10;// console.log('Hello');"></textarea>
+            
+<textarea id="pasteArea" placeholder="// 请在此粘贴 AI 生成的代码文本...&#10;// 格式示例：&#10;// === File: src/main.js ===&#10;// console.log('Hello');"></textarea>
                         </div>
                     </div>
 
                     <div class="action-bar-center mb-24">
-                        <button class="btn btn-primary large-btn" onclick="remoldToZip()">
+       
+<button class="btn btn-primary large-btn" onclick="remoldToZip()">
                             <span class="btn-icon">🏗️</span>重塑<span class="btn-suffix">Remold</span>
                         </button>
                     </div>
-                </div>
+     
+</div>
             </div>
         </div>
 
@@ -260,24 +310,29 @@
             <div class="container empty-frame">
                 <header>
                     <div class="header-row">
-                        <div class="logo-area">
+        
+<div class="logo-area">
                             <div class="logo-wrapper">
                                 <h1>Refine</h1>
-                                <span class="silver-tag">Code Polisher</span>
+                      
+<span class="silver-tag">Code Polisher</span>
                             </div>
                         </div>
                     </div>
-                    <div class="subtitle">Polish & Perfect your codebase for <strong>Ultimate</strong> quality.<span class="btn-suffix">Analyze & Fix.</span></div>
+                
+<div class="subtitle">Polish & Perfect your codebase for <strong>Ultimate</strong> quality.<span class="btn-suffix">Analyze & Fix.</span></div>
                 </header>
                 
                 <div class="placeholder-content">
                     <div class="icon-circle secondary">
-                        <span class="icon-folder">🚧</span>
+              
+<span class="icon-folder">🚧</span>
                     </div>
                     <h3>Coming Soon</h3>
                     <p>Refinement tools are being developed.</p>
                 </div>
-            </div>
+        
+</div>
         </div>
 
     </div>

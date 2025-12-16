@@ -10,7 +10,9 @@ class ProjectProcessor {
             .filter(line => line && !line.startsWith('#'))
             .map(rule => {
                 const isDir = rule.endsWith('/');
-                const clean = rule.replace(/\/$/, '');
+                const clean = 
+
+rule.replace(/\/$/, '');
                 return { rule: clean, isDir }; 
             });
     }
@@ -27,7 +29,7 @@ class ProjectProcessor {
                 if (parts.includes(rule)) return true;
                 if (rule.includes('/')) {
                     const normalizedRule = rule.startsWith('/') ?
-                        rule.slice(1) : rule;
+                    rule.slice(1) : rule;
                     if (path === normalizedRule || 
                         path.startsWith(normalizedRule + '/') || 
                         path.includes('/' + normalizedRule + '/')) {
@@ -61,6 +63,7 @@ class ProjectProcessor {
                 let str = prefix + (last ? "└── " : "├── ") + key + "\n";
                 if (Object.keys(node[key]).length) str += print(node[key], prefix + (last ? "    " : "│   "));
         
+ 
                 return str;
             }).join('');
         };
