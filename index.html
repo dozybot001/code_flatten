@@ -15,20 +15,18 @@
 <body>
 <div id="loadingOverlay" class="loading-overlay hidden"><div class="spinner"></div><div class="loading-text">Processing...</div></div>
 <div id="hiddenSidebar">
-    <div id="homeBookmark" class="nav-hidden" onclick="scrollToSection('welcome')">
-        <span class="bookmark-icon">🏠</span><span class="bookmark-text">HOME</span><span class="bookmark-arrow">➜</span>
+    <div id="homeBookmark" class="nav-hidden" onclick="scrollToSection('welcome')"><span class="bookmark-text">🏠 HOME
     </div>
-    <div id="guideBookmark" class="nav-hidden" onclick="toggleSidebar()">
-        <span class="bookmark-icon">📖</span><span class="bookmark-text">README</span><span class="bookmark-arrow">➜</span>
+    <div id="guideBookmark" class="nav-hidden" onclick="toggleSidebar()"><span class="bookmark-text">📖 README</span>
     </div>
     <div class="sidebar-content">
         <div id="readmeContent" class="markdown-body"><div class="loading-spinner">⏳ Loading README...</div></div>
     </div>
 </div>
 <div id="rightNavContainer" class="nav-hidden">
-    <div class="nav-bookmark" onclick="scrollToSection('cast')" id="bm-cast"><span class="bookmark-text">Cast</span><span class="bookmark-icon">🚀</span></div>
-    <div class="nav-bookmark" onclick="scrollToSection('forge')" id="bm-forge"><span class="bookmark-text">Forge</span><span class="bookmark-icon">⚒️</span></div>
-    <div class="nav-bookmark" onclick="scrollToSection('refine')" id="bm-refine"><span class="bookmark-text">Refine</span><span class="bookmark-icon">✨</span></div>
+    <div class="nav-bookmark" onclick="scrollToSection('cast')" id="bm-cast"><span class="bookmark-text">Cast 🚀</span></div>
+    <div class="nav-bookmark" onclick="scrollToSection('forge')" id="bm-forge"><span class="bookmark-text">Forge ⚒️</span></div>
+    <div class="nav-bookmark" onclick="scrollToSection('refine')" id="bm-refine"><span class="bookmark-text">Refine ✨</span></div>
 </div>
 <div id="toast-container"></div>
 <div id="viewSlider">
@@ -58,8 +56,8 @@
                 </div>
             </header>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('smelt')"><span class="tab-icon">🔥</span> 熔炼</button>
-                <button class="tab-btn" onclick="switchTab('remold')"><span class="tab-icon">🏗️</span> 重塑</button>
+                <button class="tab-btn active" onclick="switchTab('smelt')">🔥 熔炼</button>
+                <button class="tab-btn" onclick="switchTab('remold')">🏗️ 重塑</button>
                 <div class="tab-indicator"></div>
             </div>
             <div id="smeltSection" class="section-content active">
@@ -85,10 +83,10 @@
                             <div class="panel-header">
                                 <span class="panel-title">已选文件</span>
                                 <div class="panel-tools">
-                                    <button class="tool-btn" onclick="clearFileTree()" title="清空"><span class="btn-icon">🗑️</span>清空</button>
                                     <button class="tool-btn" onclick="copyTreeOnly()">🌳 仅复制树</button>
                                     <button class="tool-btn" onclick="triggerAddExtra()">➕ 补充</button>
                                     <button class="tool-btn" onclick="toggleAllFiles()">☑️ 全选</button>
+                                    <button class="tool-btn" onclick="clearFileTree()">🗑️ 清空</button>
                                 </div>
                             </div>
                             <div id="fileTree" class="tree-container scrollable-tree"></div>
@@ -96,16 +94,16 @@
                     </div>
                 </div>
                 <div class="action-bar-center mb-24">
-                    <button class="btn btn-primary large-btn" onclick="doSmelt()"><span class="btn-icon">🔥</span> 熔炼</button>
+                    <button class="btn btn-primary large-btn" onclick="doSmelt()">🔥 熔炼</button>
                 </div>
                 <input type="file" id="extraFileInput" multiple style="display:none">
                 <div class="panel-container unified-height-preview" id="previewContainer">
                     <div class="panel-header">
                         <span class="panel-title">👁️ 文本预览</span>
                         <div class="panel-tools">
-                            <button class="tool-btn" onclick="resetResultsArea()" title="清空"><span class="btn-icon">🗑️</span>清空</button>
-                            <button class="tool-btn" onclick="copyToClipboard()"><span class="btn-icon">📋</span>复制</button>
-                            <button class="tool-btn" onclick="downloadFile()"><span class="btn-icon">⬇️</span> 下载</button>
+                            <button class="tool-btn" onclick="copyToClipboard()">📋 复制</button>
+                            <button class="tool-btn" onclick="downloadFile()">⬇️ 下载</button>
+                            <button class="tool-btn" onclick="resetResultsArea()">🗑️ 清空</button>
                         </div>
                     </div>
                     <div class="code-editor-look"><pre id="previewArea" placeholder="// 等待处理..."></pre></div>
@@ -130,13 +128,13 @@
                     <div class="panel-header">
                         <div class="title-group"><span class="panel-title">📄 粘贴文本</span></div>
                         <div class="panel-tools">
-                            <button class="tool-btn" onclick="clearPasteArea()" title="清空内容"><span class="btn-icon">🗑️</span>清空内容</button>
+                            <button class="tool-btn" onclick="clearPasteArea()">🗑️ 清空内容</button>
                         </div>
                     </div>
                     <div class="editor-wrapper full-height-col"><textarea id="pasteArea" placeholder="// 请在此粘贴 AI 生成的代码文本..."></textarea></div>
                 </div>
                 <div class="action-bar-center mb-24">
-                    <button class="btn btn-primary large-btn" onclick="remoldToZip()"><span class="btn-icon">🏗️</span>重塑</button>
+                    <button class="btn btn-primary large-btn" onclick="remoldToZip()">🏗️ 重塑</button>
                 </div>
             </div>
         </div>
@@ -165,7 +163,7 @@
                 </div>
             </div>
             <div class="refine-footer" style="margin-bottom: 24px;">
-                <button class="btn btn-primary large-btn" onclick="RefineModule.downloadResult()"><span class="btn-icon">🏗️</span> 重塑</button>
+                <button class="btn btn-primary large-btn" onclick="RefineModule.downloadResult()">🏗️ 重塑</button>
             </div>
             <div class="refine-diff-row">
                 <div class="panel-container full-height-panel">
@@ -173,7 +171,7 @@
                         <span class="panel-title">变更预览</span>
                         <div class="panel-tools"><button class="tool-btn" onclick="RefineModule.clearDiff()">🗑️ 清空</button></div>
                     </div>
-                    <div id="diffViewer" class="code-editor-look diff-viewer-scroll"><div class="empty-tree-msg">等待分析...</div></div>
+                    <div id="diffViewer" class="code-editor-look diff-viewer-scroll"></div>
                 </div>
             </div>
             <div class="guide-box unified-height-prompt">

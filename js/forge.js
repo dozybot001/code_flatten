@@ -33,8 +33,7 @@ class ProjectProcessor {
         const parts = path.split('/');
         const fileName = parts[parts.length-1];
         if (parts.some(p => this.ignoreDirs.includes(p))) return true;
-        if (this.ignoreExts.some(ext => fileName.toLowerCase().endsWith(ext))) return true;
-        
+        if (this.ignoreExts.some(ext => fileName.toLowerCase().endsWith(ext) || parts.includes(ext))) return true;
         if (this.gitIgnoreRules.length > 0) {
             for (const {rule, isDir} of this.gitIgnoreRules) {
                 if (parts.includes(rule)) return true;

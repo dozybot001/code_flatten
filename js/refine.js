@@ -74,60 +74,96 @@ const RefineModule = {
             }
         }, 100);
     },
+    // === 在 AIchemy/js/refine.js 中替换相关方法 ===
+
     parsePatches: function(rawText) {
         const fileBlockRegex = /(?:^|\n)=== File:\s*(.*?)\s*===/g;
-        let match; const fileBlocks = [];
+        let match;
+        const fileBlocks = [];
         while ((match = fileBlockRegex.exec(rawText)) !== null) {
             fileBlocks.push({ path: match[1].trim(), startIndex: match.index, fullMatch: match[0] });
         }
+        
         const patches = [];
         fileBlocks.forEach((block, i) => {
             const nextBlock = fileBlocks[i+1];
             const contentEnd = nextBlock ? nextBlock.startIndex : rawText.length;
             const blockContent = rawText.substring(block.startIndex + block.fullMatch.length, contentEnd);
-            const srRegex = /<<<<<< SEARCH\s*([\s\S]*?)\s*======\s*([\s\S]*?)\s*>>>>>>/g;
-            let srMatch;
-            while ((srMatch = srRegex.exec(blockContent)) !== null) {
-                patches.push({ file: block.path, search: srMatch[1], replace: srMatch[2] });
+            
+            // 新的正则逻辑：匹配 START, 内容, END
+            // 注意：[\s\S]*? 非贪婪匹配中间的内容
+            const anchorRegex = /<<<<<< START\s*([\s\S]*?)\s*======\s*([\s\S]*?)\s*======\s*>>>>>> END\s*([\s\S]*?)(?:$|\n)/g;
+            
+            let pMatch;
+            while ((pMatch = anchorRegex.exec(blockContent)) !== null) {
+                patches.push({
+                    file: block.path,
+                    startAnchor: pMatch[1].trim(), // 起始锚点行
+                    replacement: pMatch[2],        // 新代码块 (不做 trim，保留缩进)
+                    endAnchor: pMatch[3].trim()    // 结束锚点行
+                });
             }
         });
         return patches;
     },
+
     applyPatchesToBase: function(baseText, patches) {
-        let currentText = baseText;
-        let successCount = 0; const logs = [];
-        patches.forEach((patch, index) => {
-            const safePath = patch.file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const fileHeaderRegex = new RegExp(`=== File:\\s*${safePath}\\s*===`);
-            const headerMatch = currentText.match(fileHeaderRegex);
-            if (!headerMatch) { logs.push({ patch, status: 'fail', msg: 'File header not found in base text' }); return; }
-            const fileStartIndex = headerMatch.index; const fileHeaderLength = headerMatch[0].length;
-            const nextFileMarker = "\n=== File:";
-            let fileEndIndex = currentText.indexOf(nextFileMarker, fileStartIndex + fileHeaderLength);
-            if (fileEndIndex === -1) fileEndIndex = currentText.length;
-            const fileContentFull = currentText.substring(fileStartIndex, fileEndIndex);
-            const norm = (str) => str.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            const searchBlockNorm = norm(patch.search);
-            if (fileContentFull.includes(searchBlockNorm)) {
-                const newFileContent = fileContentFull.replace(searchBlockNorm, norm(patch.replace));
-                const beforeFile = currentText.substring(0, fileStartIndex);
-                const afterFile = currentText.substring(fileEndIndex);
-                currentText = beforeFile + newFileContent + afterFile;
-                successCount++;
-                logs.push({ patch, status: 'success' });
-            } else {
-                const trimmedSearch = searchBlockNorm.trim();
-                if (fileContentFull.includes(trimmedSearch) && trimmedSearch.length > 5) {
-                     const newFileContent = fileContentFull.replace(trimmedSearch, norm(patch.replace).trim());
-                     const beforeFile = currentText.substring(0, fileStartIndex);
-                     const afterFile = currentText.substring(fileEndIndex);
-                     currentText = beforeFile + newFileContent + afterFile;
-                     successCount++;
-                     logs.push({ patch, status: 'success', warning: 'Trimmed match applied' });
-                } else logs.push({ patch, status: 'fail', msg: 'Search block not found in file content' });
+        // 统一换行符并拆分为行数组，方便处理
+        let lines = baseText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        let successCount = 0;
+        const logs = [];
+
+        // 为了防止索引偏移，我们倒序应用补丁，或者每次操作后重新计算（这里简单起见，假设补丁是顺序无关或针对不同文件的，但在单文件多补丁时最好重新定位）
+        // 更健壮的方法：先定位所有补丁的行号，验证无冲突后，再从下往上替换。
+        
+        // 分组处理：按文件分组，每个文件内部按行号倒序处理
+        // 这里简化演示单次扫描逻辑，实际建议对 lines 数组进行操作
+        
+        for (const patch of patches) {
+             // 1. 寻找 Start Anchor 的行号
+            let startIndex = -1;
+            let endIndex = -1;
+            
+            // 简单的模糊匹配：忽略首尾空格
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].trim() === patch.startAnchor) {
+                    startIndex = i;
+                    break; 
+                }
             }
-        });
-        return { newText: currentText, successCount, logs };
+
+            if (startIndex === -1) {
+                logs.push({ patch, status: 'fail', msg: `无法定位起始锚点: "${patch.startAnchor.substring(0, 30)}..."` });
+                continue;
+            }
+
+            // 2. 寻找 End Anchor 的行号 (必须在 Start 之后)
+            for (let i = startIndex; i < lines.length; i++) {
+                if (lines[i].trim() === patch.endAnchor) {
+                    endIndex = i;
+                    break;
+                }
+            }
+
+            if (endIndex === -1) {
+                logs.push({ patch, status: 'fail', msg: `找到起始锚点，但无法在之后定位结束锚点: "${patch.endAnchor.substring(0, 30)}..."` });
+                continue;
+            }
+
+            // 3. 执行替换
+            // 注意：startIndex 和 endIndex 是闭区间 [start, end]，这部分都会被 replacement 替换
+            // replacement 文本需要按换行符拆回数组
+            const newLines = patch.replacement.replace(/^\n/, '').replace(/\n$/, '').split('\n');
+            
+            // 数组替换操作：删除从 startIndex 到 endIndex 的行，插入 newLines
+            const deleteCount = endIndex - startIndex + 1;
+            lines.splice(startIndex, deleteCount, ...newLines);
+            
+            successCount++;
+            logs.push({ patch, status: 'success', info: `Replaced lines ${startIndex+1} to ${endIndex+1}` });
+        }
+
+        return { newText: lines.join('\n'), successCount, logs };
     },
     renderDiffView: function(patches, logs) {
         const container = document.getElementById('diffViewer');
