@@ -99,7 +99,7 @@ const App = {
 
     fetchDefaultIgnoreRules: async () => {
         try {
-            const response = await fetch('ignore');
+            const response = await fetch('ignore.txt');
             if (!response.ok) return console.warn("未找到 ignore 文件");
             
             const text = await response.text();

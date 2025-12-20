@@ -135,7 +135,7 @@ const I18N_RESOURCES = {
             labelBaseline: "（基准文件）"
         },
         prompt: {
-            header: "以下是项目的目录结构与文件内容。请基于此上下文回答我的问题：\n\n"
+            header: `以下是项目的目录结构与文件内容。请基于此上下文回答我的问题：\n\n`
         },
         html: {
             diffEmptyState: `<div class="empty-hint">此处将显示应用补丁后的差异对比…</div>`,
@@ -228,7 +228,7 @@ const I18N_RESOURCES = {
             labelBaseline: "(Baseline File)"
         },
         prompt: {
-            header: "Below is the directory structure and file content of the project. Please answer my questions based on this context:\n\n"
+            header: `Below is the directory structure and file content of the project. Please answer my questions based on this context:\n\n`
         },
         html: {
             diffEmptyState: `<div class="empty-hint">Diff after applying patch will be shown here...</div>`,
@@ -238,8 +238,7 @@ const I18N_RESOURCES = {
     }
 };
 
-// 2. 初始化全局 UI_TEXT (注意这里改为 let，允许被覆盖)
-let UI_TEXT = I18N_RESOURCES.zh;
+var UI_TEXT = I18N_RESOURCES.zh;
 
 // Constants for Parsing
 const MAGIC_TOKEN = "=== File:";
