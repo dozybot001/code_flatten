@@ -530,79 +530,60 @@ const RequirementLogic = {
         localStorage.setItem('aichemy_llm_config', JSON.stringify(config));
     },
 
-    /**
-     * 2. 调用真实 LLM API 生成动态 Schema
-     */
-    fetchMockOptions: async (userInput) => {
-
+    _callAI: async (messages, responseFormat = 'text') => {
         const config = RequirementLogic.getLLMConfig();
-        if (!config.apiKey) {
-            Utils.showToast("请先在设置中配置 API Key", "error");
-            throw new Error("No API Key");
+        if (!config.apiKey) throw new Error("请先在设置中配置 API Key");
+
+        const response = await fetch(`${config.baseUrl.replace(/\/+$/, '')}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.apiKey}`
+            },
+            body: JSON.stringify({
+                model: config.model,
+                messages: messages,
+                temperature: 0.7,
+                // 如果是 json 模式且模型支持，可以加 response_format 参数，这里保持通用
+            })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error?.message || "API Request Failed");
         }
 
-        // 定义 JSON Schema 的 System Prompt
+        const data = await response.json();
+        return data.choices[0].message.content;
+    },
+
+    fetchMockOptions: async (userInput) => {
         const systemPrompt = `
-        You are a Senior Technical Architect. 
-        Analyze the user's project request and determine the critical technical decisions needed.
-        
-        Output strictly valid JSON with NO Markdown formatting (no \`\`\`json blocks).
-        The output must be an Array of Option Groups following this schema:
-        [
-            {
-                "id": "unique_string_id",
-                "title": "Display Title (e.g. 🛠️ Tech Stack)",
-                "type": "radio" | "checkbox", 
-                "options": ["Option A", "Option B", "Option C"]
-            }
-        ]
-        
-        Generate 3-4 relevant groups based on the specific user request (e.g., if it's a game, ask about Engine/2D/3D; if it's a dashboard, ask about Charts/Data).
+        You are a Senior Technical Architect.
+        Analyze the user's project request and determine critical technical decisions.
+        Output strictly valid JSON (Array of Option Groups) with NO Markdown.
+        Schema: [{"id":"...","title":"...","type":"radio|checkbox","options":[...]}]
         Always include a "Visual Style" group.
         `;
 
         try {
-            const response = await fetch(`${config.baseUrl.replace(/\/+$/, '')}/chat/completions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.apiKey}`
-                },
-                body: JSON.stringify({
-                    model: config.model,
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: `User Request: "${userInput}"` }
-                    ],
-                    temperature: 0.7
-                })
-            });
+            // 调用通用方法
+            let content = await RequirementLogic._callAI([
+                { role: "system", content: systemPrompt },
+                { role: "user", content: `User Request: "${userInput}"` }
+            ]);
 
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || "API Request Failed");
-            }
-
-            const data = await response.json();
-            let content = data.choices[0].message.content;
-
-            // 清洗数据：移除可能存在的 Markdown 代码块标记
+            // 清洗数据
             content = content.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-            
             return JSON.parse(content);
-
         } catch (error) {
-            Utils.showToast(`LLM Error: ${error.message}`, "error");
             console.error("LLM Call Failed:", error);
-            // 出错时返回一个保底的静态选项，保证流程不中断
-            return [
-                {
-                    id: "error_fallback",
-                    title: "⚠️ 连接失败，使用默认选项",
-                    type: "checkbox",
-                    options: ["Vanilla JS", "HTML5", "CSS3"]
-                }
-            ];
+            Utils.showToast(`分析失败: ${error.message}`, "error");
+            // 返回兜底数据
+            return [{
+                id: "error_fallback", title: "⚠️ 建议手动补充细节", type: "checkbox",
+                options: ["由 AI 自由决定", "遵循最佳实践"]
+            }];
         }
     },
 
@@ -646,41 +627,72 @@ const RequirementLogic = {
     /**
      * 3. 生成最终 Prompt 并处理 UI 自适应
      */
-    generateFinalPrompt: () => {
-         
-         const userCommand = document.getElementById('input-req-command').value.trim();
-         if (!userCommand) return Utils.showToast("请先输入一些需求想法", "error");
+    generateFinalPrompt: async () => {
+        const userCommand = document.getElementById('input-req-command').value.trim();
+        if (!userCommand) return Utils.showToast("请先输入一些需求想法", "error");
 
-         const inputs = document.querySelectorAll('.chip-input:checked');
-         let selections = {};
-         inputs.forEach(input => {
-             const group = input.dataset.group;
-             if (!selections[group]) selections[group] = [];
-             selections[group].push(input.value);
-         });
+        // 收集用户选中的标签
+        const inputs = document.querySelectorAll('.chip-input:checked');
+        let selectionsStr = "";
+        inputs.forEach(input => {
+            const groupTitle = input.dataset.group; // 注意：renderOptions 里要把 data-group 改存 title 更直观
+            selectionsStr += `- ${groupTitle}: ${input.value}\n`;
+        });
 
-         const prompt = `
-# Role: Senior Frontend Developer
+        const btn = document.getElementById('action-gen-prompt');
+        const originalText = btn.innerText;
+        btn.innerText = "生成中...";
+        btn.disabled = true;
 
-## 1. User Task
-${userCommand}
+        // 定义 Meta-Prompt (教 AI 如何写 Prompt 的 Prompt)
+        const systemPrompt = `
+        You are an expert "Prompt Engineer" and Senior Technical Lead.
+        Your goal is to write a highly detailed, structured, and professional coding prompt for another AI Developer.
+        
+        Based on the "User's Original Idea" and the "Technical Constraints/Choices":
+        1. Expand the requirements into a clear implementation plan.
+        2. Define the project structure, key features, and code quality standards.
+        3. The output format must be Markdown, ready to be copied and pasted.
+        4. Start directly with "# Project Requirement Specification".
+        `;
 
-## 2. Technical Decisions (Architected by LLM)
-${Object.entries(selections).length === 0 ? "(Auto-decide based on best practices)" : ""}
-${Object.entries(selections).map(([key, vals]) => `- **${key}**: ${vals.join(', ')}`).join('\n')}
+        const userMessage = `
+        [User's Original Idea]
+        ${userCommand}
 
-## 3. Implementation Context
-- **Project Structure**: Follow the existing file tree strictly.
-- **Code Quality**: Write modular, clean, and performant code.
-- **Style**: Use CSS variables defined in global.css.
-`.trim();
+        [Technical Constraints/Choices]
+        ${selectionsStr || "No specific constraints selected, decide based on best practices."}
 
-        const outputArea = document.getElementById('output-architect-prompt');
-        const resultContainer = document.getElementById('container-final-prompt');
-        outputArea.value = prompt;
-        resultContainer.classList.remove('hidden');
-        outputArea.style.height = 'auto';
-        outputArea.style.height = (outputArea.scrollHeight + 2) + 'px';
-        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        [Context]
+        The user has an existing file structure (seen in the file tree). 
+        Please instruct the AI developer to implement the features within this context.
+        `;
+
+        try {
+            const finalPrompt = await RequirementLogic._callAI([
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userMessage }
+            ]);
+
+            // 输出结果
+            const outputArea = document.getElementById('output-architect-prompt');
+            const resultContainer = document.getElementById('container-final-prompt');
+            
+            outputArea.value = finalPrompt;
+            resultContainer.classList.remove('hidden');
+            
+            // 自动调整高度
+            outputArea.style.height = 'auto';
+            outputArea.style.height = (outputArea.scrollHeight + 2) + 'px';
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            Utils.showToast("Prompt 生成完毕", "success");
+
+        } catch (error) {
+            Utils.showToast(`生成失败: ${error.message}`, "error");
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 };
