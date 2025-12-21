@@ -7,8 +7,7 @@ self.onmessage = async (e) => {
 
     try {
         const zip = new JSZip();
-        // 稍微放宽正则匹配，确保容错
-        const headerRegex = /(?:^|\n)(?:\\+)?\\\=== File:\s*(.*?)\s*===/g;
+        const headerRegex = /(?:^|\n)(?:\\+)?=== File:\s*(.*?)\s*===/g;
         
         let match;
         let count = 0;

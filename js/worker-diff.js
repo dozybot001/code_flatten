@@ -17,7 +17,7 @@ self.onmessage = (e) => {
     const dmp = new diff_match_patch();
     
     // 1. 解析 Patch 文本
-    const fileRegex = /(?:^|\n)(?:\\+)?\\\\=== File:\s*(.*?)\s*===\s*[\r\n]+<<<< SEARCH\s*([\s\S]*?)==== REPLACE\s*([\s\S]*?)>>>>/g;
+    const fileRegex = /(?:^|\n)(?:\\+)?=== File:\s*(.*?)\s*===\s*[\r\n]+<<<< SEARCH\s*([\s\S]*?)==== REPLACE\s*([\s\S]*?)>>>>/g;
     const patches = [];
     let match;
 
