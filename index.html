@@ -4,25 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIchemy</title>
-    <link rel="stylesheet" type="text/css" href="css/global.css">
+    <link rel="stylesheet" href="css/global.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="toast-overlay"></div>
-    
     <nav class="app-header">
         <button id="action-switch-lang" class="ui-btn" data-i18n="buttons.switchLang"></button>
         <a href="https://github.com/dozybot001/AIchemy" class="ui-btn" data-i18n="labels.github"></a>
-        <a href="https://dozybot001.github.io/2025/10/25/5_S/" class="ui-btn" data-i18n="labels.blog"></a>
+        <a href="https://dozybot001.github.io" class="ui-btn" data-i18n="labels.blog"></a>
         <button id="action-settings" class="ui-btn" title="API Settings">⚙️</button> 
     </nav>
-
     <div class="layout-section">
-        <div class="hero-banner">
-            <h1 data-i18n="labels.appName"></h1>
-            </div>
+        <div class="hero-banner"><h1 data-i18n="labels.appName"></h1></div>
     </div>
-
     <div class="layout-section">
         <div class="app-workspace">
             <input type="file" id="input-upload-directory" class="hidden-input" webkitdirectory directory multiple>
@@ -31,28 +26,25 @@
 
             <div class="gemini-hero-container">
                 <div class="gemini-input-wrapper">
-                    <input type="text" id="input-req-command" class="gemini-main-input" 
-                           placeholder="输入你的简短想法，例如：我要做一个贪吃蛇游戏..." autocomplete="off">
+                    <input type="text" id="input-req-command" class="gemini-main-input" autocomplete="off">
                     <button class="ui-btn" id="action-analyze-req">分析</button>
                 </div>
             </div>
             
             <div class="ui-card" id="card-prompt-architect">
                 <div class="ui-card__header">
-                    <h2 data-i18n="labels.panelArchitect">需求架构师</h2>
+                    <h2 data-i18n="labels.panelArchitect"></h2>
                     <div class="ui-toolbar">
                         <button class="ui-btn" id="action-gen-prompt">生成</button>
                         <button class="ui-btn" id="action-copy-prompt">复制</button>
                         <button class="ui-btn" id="action-reset-architect">🗑️</button>
                     </div>
                 </div>
-                
                 <div class="architect-container">
                     <div id="container-req-options" class="architect-options-area hidden"></div>
-
                     <div id="container-final-prompt" class="architect-result-area hidden">
                         <div class="divider-line mb-3"></div>
-                        <textarea class="ui-editor-area auto-grow-textarea" id="output-architect-prompt" readonly placeholder="等待生成 Prompt..."></textarea>
+                        <textarea class="ui-editor-area auto-grow-textarea" id="output-architect-prompt" readonly></textarea>
                     </div>
                 </div>
             </div>
@@ -107,9 +99,8 @@
                 <div class="ui-card__header">
                     <h2 data-i18n="labels.panelDiff"></h2>
                     <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-apply-download">应用 & 下载</button>
-                        <button class="ui-btn" id="action-apply-copy">应用 & 复制</button>
-                        
+                        <button class="ui-btn" id="action-apply-download" data-i18n="buttons.applyDownload"></button>
+                        <button class="ui-btn" id="action-apply-copy" data-i18n="buttons.applyCopy"></button>
                         <button class="ui-btn" id="action-clear-diff" data-i18n="buttons.clear"></button>
                     </div>
                 </div>
@@ -132,26 +123,25 @@
     <div id="modal-settings" class="modal-overlay hidden">
         <div class="ui-card modal-content">
             <div class="ui-card__header">
-                <h2>⚙️ 模型配置</h2>
+                <h2>⚙️ 配置</h2>
                 <button class="ui-btn" id="action-close-settings">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>API Provider Base URL</label>
-                    <input type="text" id="setting-base-url" class="ui-input" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
-                    <small>支持 OpenAI, DeepSeek, Gemini (via OpenAI compat), OpenRouter 等</small>
+                    <label>API Base URL</label>
+                    <input type="text" id="setting-base-url" class="ui-input" placeholder="https://api.openai.com/v1">
                 </div>
                 <div class="form-group">
                     <label>API Key</label>
-                    <input type="password" id="setting-api-key" class="ui-input" placeholder="sk-...">
+                    <input type="password" id="setting-api-key" class="ui-input">
                 </div>
                 <div class="form-group">
-                    <label>Model Name</label>
-                    <input type="text" id="setting-model" class="ui-input" placeholder="gpt-4o, deepseek-chat..." value="gpt-4o">
+                    <label>Model</label>
+                    <input type="text" id="setting-model" class="ui-input" placeholder="gpt-4o">
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="ui-btn" id="action-save-settings">保存配置</button>
+                <button class="ui-btn" id="action-save-settings">保存</button>
             </div>
         </div>
     </div>
@@ -159,10 +149,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
-    
-    <script type="text/javascript" src="js/config.js"></script>
-    <script type="text/javascript" src="js/utils.js"></script>
-    <script type="text/javascript" src="js/core.js"></script>
-    <script type="text/javascript" src="js/app.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
