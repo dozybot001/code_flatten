@@ -1,0 +1,87 @@
+.diff-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+.diff-card {
+    background-color: var(--gray-l2);
+    border: none; 
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 0.85rem;
+}
+.diff-header {
+    padding: 10px 16px;
+    background-color: var(--gray-l3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-3);
+}
+.diff-file-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-2);
+    font-weight: 500;
+}
+.diff-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+}
+.diff-pane-header {
+    padding: 6px 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--text-4);
+    background-color: var(--gray-l4);
+    user-select: none;
+}
+.diff-half { display: flex; flex-direction: column; min-width: 0; }
+
+.diff-block {
+    padding: 12px 16px;
+    line-height: 1.5;
+    white-space: pre-wrap;     
+    word-break: break-all;     
+    flex: 1;                   
+    font-size: 0.8rem;
+    overflow-x: auto;
+}
+.diff-old { background-color: var(--state-error-bg); color: var(--state-error-text); }
+.diff-new { background-color: var(--state-success-bg); color: var(--state-success-text); }
+
+@media (max-width: 768px) {
+    .diff-content { grid-template-columns: 1fr; }
+    .diff-half:first-child { border-right: none; }
+}
+
+.diff-actions {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background-color: var(--gray-l3);
+}
+.diff-checkbox { accent-color: var(--accent-blue); width: 16px; height: 16px; cursor: pointer; }
+
+.patch-confirm-area {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.error-banner {
+    background-color: var(--state-error-bg);
+    color: var(--state-error-text);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

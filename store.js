@@ -6,9 +6,22 @@ const initialState = {
     theme: localStorage.getItem('theme') || 'dark',
     projectName: 'Project',
     contextContent: null,
-    tree: [] 
+    tree: [],
+    // 新增 API 配置 (增加解析容错)
+    apiConfig: (() => {
+        try {
+            const stored = localStorage.getItem('api_config');
+            return stored ? JSON.parse(stored) : {
+                baseUrl: 'https://generativelanguage.googleapis.com',
+                apiKey: '',
+                modelName: 'gemini-pro'
+            };
+        } catch (e) {
+            console.warn("Resetting invalid API config");
+            return { baseUrl: '', apiKey: '', modelName: 'gemini-pro' };
+        }
+    })()
 };
-
 // 创建响应式 Proxy
 const reactiveState = new Proxy(initialState, {
     set(target, key, value) {

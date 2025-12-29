@@ -6,9 +6,7 @@
     <title>AI Workspace - Gemini Clone</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -41,7 +39,7 @@
         </div>
 
         <div class="sidebar-btn" id="btn-merge">
-            <span class="material-symbols-outlined">call_merge</span>
+            <span class="material-symbols-outlined icon-flip">call_merge</span>
             <span class="nav-text">Merge Project</span>
         </div>
 
@@ -72,11 +70,28 @@
 
     <main id="main-content">
         <header class="chat-header">
-            <div class="header-left">
+            <div class="header-left" style="position: relative;">
                 <button id="model-selector" class="model-selector-btn">
                     <span class="nav-text" id="model-text">Gemini 1.5 Pro</span>
                     <span class="material-symbols-outlined">expand_more</span>
                 </button>
+                
+                <div id="model-menu" class="model-menu hidden">
+                    <div class="menu-item model-option" data-value="Gemini 1.5 Pro">
+                        <span>Gemini 1.5 Pro</span>
+                    </div>
+                    <div class="menu-item model-option" data-value="Gemini 1.5 Flash">
+                        <span>Gemini 1.5 Flash</span>
+                    </div>
+                    <div class="menu-item model-option" data-value="Gemini Ultra">
+                        <span>Gemini Ultra</span>
+                    </div>
+                    <div class="separator-line" style="height: 1px; background: var(--gray-l3); margin: 4px 0;"></div>
+                    <div class="menu-item model-option" data-value="Custom API">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">api</span>
+                        <span>Use Custom API</span>
+                    </div>
+                </div>
             </div>
             <div class="header-right">
                 <button id="btn-settings-top" class="icon-btn-header">
@@ -90,6 +105,36 @@
                 <div class="menu-item" id="btn-theme-toggle">
                     <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
                     <span id="theme-text">Dark Mode</span>
+                </div>
+                <div class="menu-item" id="btn-api-settings">
+                    <span class="material-symbols-outlined">settings_ethernet</span>
+                    <span>API Config</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="api-modal" class="modal-overlay hidden">
+            <div class="api-modal-card">
+                <div class="api-modal-header">
+                    <h3>API Configuration</h3>
+                    <button id="btn-close-api" class="icon-btn-small"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="api-form">
+                    <div class="form-group">
+                        <label>Base URL</label>
+                        <input type="text" id="api-base-url" placeholder="https://api.openai.com/v1" />
+                    </div>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="api-key" placeholder="sk-..." />
+                    </div>
+                    <div class="form-group">
+                        <label>Model Name</label>
+                        <input type="text" id="api-model" placeholder="gpt-4" />
+                    </div>
+                    <div class="form-actions">
+                        <button id="btn-save-api" class="btn-primary">Save Configuration</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,6 +178,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
-    <script type="module" src="ui-main.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

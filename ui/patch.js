@@ -1,28 +1,18 @@
-import { ProjectCore } from './core.js';
-import { Store } from './store.js';
+import { PatchEngine } from '../lib/patch-engine.js';
+import { Store } from '../store.js';
 
 export const PatchManager = {
     currentMatches: [],
 
-    /**
-     * 处理 Patch 逻辑入口
-     * @param {string} inputText 用户输入的 Patch 文本
-     * @param {HTMLElement} outputArea 聊天输出区域容器
-     * @param {Function} renderMessageCallback 回调函数，用于渲染普通文本
-     */
     async handleInput(inputText, outputArea, renderMessageCallback) {
-        // 渲染用户的原始指令（右侧）
         renderMessageCallback(inputText);
 
-        // 辅助函数：渲染系统消息（左侧 - AI 气泡）
         const renderSystemMessage = (element) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'chat-row ai';
             
             const bubble = document.createElement('div');
             bubble.className = 'chat-bubble ai';
-
-            // 智能检测：如果是 Diff 视图，强制使用宽模式
             if (element.classList.contains('diff-container')) {
                 bubble.classList.add('bubble-wide');
             }
@@ -34,7 +24,6 @@ export const PatchManager = {
             outputArea.scrollTop = outputArea.scrollHeight;
         };
 
-        // 1. 检查是否有 Context
         if (!Store.state.contextContent) {
             const errDiv = document.createElement('div');
             errDiv.innerHTML = `<div class="error-banner"><span class="material-symbols-outlined">error</span> No context loaded. Please upload files and click "Merge Project" or "Context TXT" first.</div>`;
@@ -42,16 +31,15 @@ export const PatchManager = {
             return;
         }
 
-        // 2. 解析 & 查找
-        const patches = ProjectCore.PatchEngine.parseInput(inputText);
+        const patches = PatchEngine.parseInput(inputText);
         if (patches.length === 0) {
             const hint = document.createElement('div');
-            hint.innerHTML = `<div style="color:var(--text-4); margin-left:10px; font-size:0.9rem; padding: 10px; background: var(--bg-translucent-faint); border-radius: 8px; display:inline-block;">⚠️ No valid search/replace blocks found. Use the standard format defined in patch.md</div>`;
+            hint.innerHTML = `<div style="color:var(--text-4); margin-left:10px; font-size:0.9rem; padding: 10px; background: var(--bg-translucent-faint); border-radius: 8px; display:inline-block;">⚠️ No valid search/replace blocks found. Use the standard format defined in prompt.md</div>`;
             renderSystemMessage(hint);
             return;
         }
 
-        const matches = ProjectCore.PatchEngine.findMatches(Store.state.contextContent, patches);
+        const matches = PatchEngine.findMatches(Store.state.contextContent, patches);
         this.currentMatches = matches; 
 
         const onApplySuccess = (count) => {
@@ -71,7 +59,6 @@ export const PatchManager = {
     },
 
     renderDiffUI(matches, onApplySuccess) {
-        // 动态注入样式，支持点击删除线效果
         if (!document.getElementById('patch-interaction-styles')) {
             const style = document.createElement('style');
             style.id = 'patch-interaction-styles';
@@ -86,21 +73,16 @@ export const PatchManager = {
 
         const container = document.createElement('div');
         container.className = 'diff-container';
-        
         container.innerHTML = `<h3 style="color:var(--text-2); margin-bottom:8px;">Diff Preview (${matches.filter(m=>m.isValid).length} matches)</h3><div style="font-size:0.8rem; color:var(--text-4); margin-bottom:12px;">Tap on a card to exclude it (strikethrough).</div>`;
-
+        
         matches.forEach((match, idx) => {
             const card = document.createElement('div');
             card.className = 'diff-card';
-            
-            // 将索引绑定在 Card 元素上，便于后续获取
             card.dataset.idx = idx;
 
             if (match.isValid) {
-                card.classList.add('interactive'); // 标记为可交互
+                card.classList.add('interactive');
                 card.title = "Click to exclude this change";
-                
-                // 点击切换排除状态
                 card.addEventListener('click', () => {
                     card.classList.toggle('patch-excluded');
                 });
@@ -112,7 +94,7 @@ export const PatchManager = {
                             ${match.file}
                         </div>
                         <div class="diff-status-icon">
-                            <span class="material-symbols-outlined icon-include" style="color:var(--state-success-text)">check</span>
+                             <span class="material-symbols-outlined icon-include" style="color:var(--state-success-text)">check</span>
                         </div>
                     </div>
                     <div class="diff-content">
@@ -120,7 +102,7 @@ export const PatchManager = {
                             <div class="diff-pane-header">Original (Search)</div>
                             <div class="diff-block diff-old">${this.escapeHtml(match.original)}</div>
                         </div>
-                        <div class="diff-half">
+                         <div class="diff-half">
                             <div class="diff-pane-header">Modified (Replace)</div>
                             <div class="diff-block diff-new">${this.escapeHtml(match.replacement)}</div>
                         </div>
@@ -135,12 +117,11 @@ export const PatchManager = {
                         </div>
                     </div>
                     <div class="diff-block" style="color:var(--state-error-text);">${match.error}<br/><small>Searched for:</small><br/>${this.escapeHtml(match.original.substring(0, 100))}...</div>
-                `;
+                 `;
             }
             container.appendChild(card);
         });
 
-        // Confirm Actions
         const validCount = matches.filter(m => m.isValid).length;
         if (validCount > 0) {
             const actionsDiv = document.createElement('div');
@@ -153,8 +134,6 @@ export const PatchManager = {
                 </button>
             `;
             container.appendChild(actionsDiv);
-            
-            // 绑定事件
             this.bindActionEvents(container, onApplySuccess);
         }
 
@@ -167,7 +146,6 @@ export const PatchManager = {
 
         if (btnApply) {
             btnApply.addEventListener('click', () => {
-                // 筛选逻辑变更：选择所有未被标记为 'patch-excluded' 且有效的 Card
                 const activeCards = container.querySelectorAll('.diff-card.interactive:not(.patch-excluded)');
                 const selectedIndices = Array.from(activeCards).map(card => parseInt(card.dataset.idx));
                 const selectedMatches = this.currentMatches.filter((_, i) => selectedIndices.includes(i));
@@ -177,27 +155,16 @@ export const PatchManager = {
                     return;
                 }
 
-                // Apply Logic
-                const newContext = ProjectCore.PatchEngine.applyPatches(Store.state.contextContent, selectedMatches);
-                Store.state.contextContent = newContext; // Update Store
+                const newContext = PatchEngine.applyPatches(Store.state.contextContent, selectedMatches);
+                Store.state.contextContent = newContext; 
 
-                // 1. UI Update: 移除操作按钮，标记 Diff 区域为已处理
                 const actionArea = container.querySelector('.patch-confirm-area');
                 if (actionArea) {
                     actionArea.innerHTML = `<div style="text-align:center; color:var(--text-4); padding:10px; font-style:italic;">Changes applied to memory.</div>`;
                 }
 
-                // 2. Feedback UI: 在下方发送一条新消息
                 if (onApplySuccess) {
                     onApplySuccess(selectedMatches.length);
-                }
-                
-                // 更新侧边栏时间 (Optional, DOM decoupling via global search)
-                const dateEl = document.getElementById('ctx-date-text');
-                if (dateEl) {
-                    const now = new Date();
-                    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-                    dateEl.textContent = `${timeStr} (Patched)`;
                 }
             });
         }

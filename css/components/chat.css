@@ -1,0 +1,462 @@
+/* --- Chat Header --- */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    width: 100%;
+    z-index: 60;
+    flex-shrink: 0;
+    background: transparent;
+}
+
+.model-selector-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 8px;
+    border-radius: 999px;
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    font-family: 'Google Sans', sans-serif;
+}
+.model-selector-btn:hover {
+    background-color: var(--gray-l3);
+    color: var(--text-1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.model-selector-btn .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--text-3);
+    transition: color 0.2s;
+}
+.model-selector-btn:hover .material-symbols-outlined { color: var(--text-1); }
+
+/* Model Menu Dropdown */
+.model-menu {
+    position: absolute;
+    top: 56px;
+    width: 200px;
+    background-color: var(--gray-l2);
+    border-radius: 12px;
+    z-index: 100;
+    padding: 8px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    transform-origin: top left;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+}
+.model-menu.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95) translateY(-10px);
+    pointer-events: none;
+}
+.model-option {
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    transition: background-color 0.1s;
+}
+.model-option:hover { background-color: var(--gray-l3); color: var(--text-1); }
+.model-option .material-symbols-outlined { font-size: 20px; color: var(--text-3); }
+.model-option:hover .material-symbols-outlined { color: var(--text-1); }
+
+.icon-btn-header {
+    background: transparent;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+.icon-btn-header:hover { background-color: var(--gray-l3); color: var(--text-1); }
+
+/* --- Output Area --- */
+.output-area {
+    flex: 1;
+    padding: 20px 20px 60px 20px; 
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    scroll-behavior: smooth; 
+}
+.output-area.hidden { display: none; }
+
+/* Chat Rows & Bubbles */
+.chat-row {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 8px auto;
+    padding-right: 16px;
+    box-sizing: border-box;
+}
+.chat-row.user { justify-content: flex-end; }
+.chat-row.ai { justify-content: flex-start; }
+
+.chat-bubble {
+    padding: 12px 18px;
+    width: fit-content;
+    max-width: 90%;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    position: relative;
+    word-break: break-word;
+}
+.chat-bubble.user {
+    background-color: var(--gray-l3);
+    color: var(--text-1);
+    border-radius: 18px 18px 4px 18px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.user-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 100%;
+}
+.user-meta-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    max-width: 100%;
+}
+.history-tag {
+    background-color: var(--gray-l3); /* 统一背景色 */
+    border: none;
+    color: var(--text-2); /* 提升文字亮度 */
+    padding: 8px 12px;    /* 增加内边距 */
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: auto;
+    min-height: 36px;     /* 保证高度与文件卡片接近 */
+    user-select: none;
+    transition: background 0.2s;
+}
+.history-tag .material-symbols-outlined { 
+    font-size: 18px;      /* 稍微调大图标 */
+    color: var(--text-3); 
+}
+.user-meta-header .file-card {
+    cursor: default; 
+    margin: 0;
+    min-width: 120px;
+    padding: 8px 12px;
+}
+.user-meta-header .file-card:hover { background-color: var(--gray-l3); }
+
+.chat-bubble.ai {
+    background-color: transparent;
+    color: var(--text-2);
+    border-radius: 18px 18px 18px 4px;
+    padding-left: 0;
+}
+.chat-bubble.bubble-wide { width: 100%; max-width: 100%; }
+.chat-bubble.ai .diff-container,
+.chat-bubble.ai .error-banner {
+    width: 100%;
+    max-width: unset !important; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Input Area --- */
+.input-wrapper {
+    width: 100%;
+    max-width: 800px;
+    padding: 0 20px;
+    transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1), top 0.5s cubic-bezier(0.2, 0, 0, 1);
+    display: flex;
+    flex-direction: column;
+}
+.input-wrapper.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.input-wrapper.bottom {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0 0 20px 0;
+    top: auto;
+}
+
+.gemini-input-container {
+    background-color: var(--gray-l2); 
+    border-radius: 28px; 
+    padding: 16px; 
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: none;
+    box-shadow: 0 0 0 0 transparent; 
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* File Preview */
+.input-files-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;             
+    padding: 10px 10px;
+    max-height: 140px;     
+    overflow-y: auto;
+    width: 100%;
+}
+.input-files-area.hidden { display: none; }
+
+.file-card {
+    background-color: var(--gray-l3); 
+    border: none;
+    border-radius: 12px;       
+    padding: 10px 14px;     
+    display: flex;
+    flex-direction: column;    
+    align-items: flex-start;   
+    justify-content: center;
+    gap: 2px;                  
+    min-width: 140px;          
+    max-width: 200px;
+    cursor: pointer;           
+    user-select: none;
+    box-shadow: none;
+    transition: background-color 0.2s ease, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+}
+.file-card:hover { background-color: var(--gray-l4); }
+.file-card:active { transform: scale(0.96); }
+.file-card .file-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-2); 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+.file-card .file-type {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+textarea#main-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 2px 8px; 
+    outline: none;
+    resize: none;
+    height: 30px; 
+    min-height: 30px;
+    max-height: 250px; 
+    overflow-y: hidden;
+}
+
+/* Toolbar */
+.input-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    flex-shrink: 0;
+}
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    overflow-x: auto;
+}
+.toolbar-tag-container { display: flex; gap: 6px; }
+
+.input-tag {
+    background-color: var(--gray-l3);
+    color: var(--text-2);
+    padding: 0 16px;          
+    height: 36px;         
+    border-radius: 999px;     
+    font-size: 0.85rem;       
+    font-family: 'Google Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    animation: fadeIn 0.2s ease;
+    transition: background 0.2s;
+}
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+.input-tag:hover { background-color: var(--gray-l4); }
+.input-tag .remove-tag { font-size: 14px; }
+
+.icon-btn-small {
+    background: transparent;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+.icon-btn-small:hover { background-color: var(--gray-l3); }
+
+.send-btn-filled {
+    background: transparent;
+    color: var(--text-2);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+}
+.send-btn-filled:hover { background-color: var(--gray-l3); }
+.send-btn-filled:active { transform: scale(0.95); }
+
+/* External Tags */
+.mode-tags {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    justify-content: flex-start; 
+    padding-left: 0;
+}
+.chip {
+    background: transparent;
+    border: none;             
+    color: var(--text-3);
+    padding: 12px 24px;       
+    border-radius: 999px; 
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s;
+}
+.chip:hover { background-color: var(--gray-l3); color: var(--text-1); }
+.chip .material-symbols-outlined { font-size: 20px;
+}
+
+/* --- Dynamic Form Styles --- */
+.form-bubble {
+    background-color: var(--gray-l2) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    width: 100%;
+    border: 1px solid var(--gray-l3);
+}
+
+.form-title {
+    margin-bottom: 16px;
+    font-size: 1rem;
+    color: var(--text-1);
+    border-bottom: 1px solid var(--gray-l3);
+    padding-bottom: 12px;
+}
+
+.form-group-item {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-3);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* 隐藏原生 Radio/Checkbox */
+.option-chip input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.option-chip span {
+    display: inline-flex;
+    padding: 6px 14px;
+    background-color: var(--gray-l3);
+    color: var(--text-2);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    user-select: none;
+}
+
+.option-chip:hover span {
+    background-color: var(--gray-l4);
+    color: var(--text-1);
+}
+
+/* 选中状态 */
+.option-chip input:checked + span {
+    background-color: var(--state-success-bg);
+    color: var(--state-success-text);
+    border-color: var(--state-success-text);
+    font-weight: 500;
+}
+
+.form-actions-row {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+}

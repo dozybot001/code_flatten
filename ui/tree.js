@@ -1,28 +1,26 @@
-import { ProjectCore } from './core.js';
-import { Store } from './store.js';
+import { FileSystem } from '../lib/file-system.js';
+import { Store } from '../store.js';
 
 export const TreeManager = {
     dom: {},
 
     init() {
-        // 1. 获取 DOM 引用
         this.dom = {
             sidebar: document.getElementById('sidebar'),
             btnMenu: document.getElementById('btn-menu'),
             uploadZoneSource: document.getElementById('upload-zone-source'),
             asciiContainer: document.getElementById('ascii-tree-view'),
-            projectStatsBtn: document.getElementById('project-stats'), // 新增引用
-            treePopover: document.getElementById('tree-popover'),    // 新增引用
+            
+            projectStatsBtn: document.getElementById('project-stats'),
+            treePopover: document.getElementById('tree-popover'),
             statFilesEl: document.getElementById('stat-files'),
             statTokensEl: document.getElementById('stat-tokens'),
             btnMemoryView: document.getElementById('btn-memory-view'),
-            ctxHistoryList: document.getElementById('context-history-list') // 替换旧的引用
+            ctxHistoryList: document.getElementById('context-history-list')
         };
 
-        // 2. 初始化监听器
         this.setupEventListeners();
         
-        // 3. 订阅 Store 变更
         Store.subscribe((key, value) => {
             if (key === 'tree') {
                 this.renderASCIITree(value);
@@ -33,27 +31,22 @@ export const TreeManager = {
             }
         });
 
-        // 4. 初始化状态
         this.renderASCIITree(Store.state.tree);
         this.toggleSidebar(Store.state.isSidebarExpanded);
     },
 
     setupEventListeners() {
-        // 菜单切换
         if (this.dom.btnMenu) {
             this.dom.btnMenu.addEventListener('click', () => {
                 Store.state.isSidebarExpanded = !Store.state.isSidebarExpanded;
             });
         }
 
-        // 统计栏点击 -> 切换文件树弹窗
         if (this.dom.projectStatsBtn && this.dom.treePopover) {
             this.dom.projectStatsBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.dom.treePopover.classList.toggle('hidden');
             });
-
-            // 点击外部关闭弹窗
             document.addEventListener('click', (e) => {
                 if (!this.dom.treePopover.classList.contains('hidden') && 
                     !this.dom.treePopover.contains(e.target) && 
@@ -63,12 +56,10 @@ export const TreeManager = {
             });
         }
 
-        // 文件树点击（事件委托）
         if (this.dom.asciiContainer) {
             this.dom.asciiContainer.addEventListener('click', (e) => this.handleTreeClick(e));
         }
 
-        // 上传区域初始化
         this.setupUploadZone(this.dom.uploadZoneSource, (files) => this.handleSourceFiles(files), true);
         this.setupUploadZone(this.dom.btnMemoryView, (files) => this.handleContextUpload(files), false, '.txt');
     },
@@ -78,8 +69,6 @@ export const TreeManager = {
         if (isExpanded) this.dom.sidebar.classList.remove('collapsed');
         else this.dom.sidebar.classList.add('collapsed');
     },
-
-    // --- 核心逻辑: 文件树与统计 ---
 
     updateProjectStats(tree) {
         if (!tree || tree.length === 0) {
@@ -102,10 +91,8 @@ export const TreeManager = {
     renderASCIITree(tree) {
         const container = this.dom.asciiContainer;
         container.innerHTML = '';
-        
         if (!tree || tree.length === 0) return; 
         const fragment = document.createDocumentFragment();
-
         tree.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = `tree-node ${item.type === 'dir' ? 'tree-node--folder' : 'tree-node--file'}`;
@@ -133,6 +120,8 @@ export const TreeManager = {
     },
 
     handleTreeClick(e) {
+        e.stopPropagation();
+
         const target = e.target.closest('.tree-node');
         if (!target) return;
 
@@ -141,16 +130,15 @@ export const TreeManager = {
 
         Store.toggleNodeSelection(index);
     },
-    // --- 核心逻辑: 文件上传 ---
 
     async handleSourceFiles(files) {
         if (!files.length) return;
         this.dom.asciiContainer.innerHTML = '<div style="padding:20px; color:var(--text-4);">Scanning files...</div>';
 
         try {
-            const result = await ProjectCore.buildFileTree(files);
+            const result = await FileSystem.buildFileTree(files);
             if (!result) return;
-            const flatTree = ProjectCore.flattenTree(result.root);
+            const flatTree = FileSystem.flattenTree(result.root);
             Store.setProject(result.projectName, flatTree);
 
             if (!Store.state.isSidebarExpanded) {
@@ -167,26 +155,21 @@ export const TreeManager = {
         const file = files[0]; 
         
         try {
-            Store.state.contextContent = await ProjectCore.readFileContent(file);
+            Store.state.contextContent = await FileSystem.readFileContent(file);
         } catch (e) {
             console.error("Failed to read context file", e);
             alert("Error reading context file");
             return;
         }
 
-        // 使用新方法更新历史记录
         this.addContextHistory(file.name);
-
         if (!Store.state.isSidebarExpanded && this.dom.btnMenu) {
             this.dom.btnMenu.click();
         }
     },
 
-    // 新增：添加 Context 历史记录
     addContextHistory(name) {
         if (!this.dom.ctxHistoryList) return;
-
-        // 移除空状态
         const emptyState = this.dom.ctxHistoryList.querySelector('.ctx-empty-state');
         if (emptyState) emptyState.remove();
 
@@ -199,14 +182,11 @@ export const TreeManager = {
             <span class="ctx-filename" title="${name}">${name}</span>
             <span class="ctx-date">${timeStr}</span>
         `;
-
-        // 插入到最前面
         this.dom.ctxHistoryList.prepend(item);
     },
 
     setupUploadZone(zoneElement, handler, isDirectory = false, accept = '') {
         if (!zoneElement) return;
-
         zoneElement.addEventListener('click', () => {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
@@ -216,14 +196,12 @@ export const TreeManager = {
             fileInput.onchange = (e) => handler(e.target.files);
             fileInput.click();
         });
-
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             zoneElement.addEventListener(eventName, (e) => {
                 e.preventDefault(); 
                 e.stopPropagation();
             }, false);
         });
-
         zoneElement.addEventListener('dragover', () => zoneElement.classList.add('drag-active'));
         zoneElement.addEventListener('dragleave', () => zoneElement.classList.remove('drag-active'));
         zoneElement.addEventListener('drop', (e) => {
