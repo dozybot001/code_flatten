@@ -1,0 +1,234 @@
+import { ProjectCore } from './core.js';
+import { Store } from './store.js';
+
+export const TreeManager = {
+    dom: {},
+
+    init() {
+        // 1. 获取 DOM 引用
+        this.dom = {
+            sidebar: document.getElementById('sidebar'),
+            btnMenu: document.getElementById('btn-menu'),
+            uploadZoneSource: document.getElementById('upload-zone-source'),
+            asciiContainer: document.getElementById('ascii-tree-view'),
+            projectStatsBtn: document.getElementById('project-stats'), // 新增引用
+            treePopover: document.getElementById('tree-popover'),    // 新增引用
+            statFilesEl: document.getElementById('stat-files'),
+            statTokensEl: document.getElementById('stat-tokens'),
+            btnMemoryView: document.getElementById('btn-memory-view'),
+            ctxHistoryList: document.getElementById('context-history-list') // 替换旧的引用
+        };
+
+        // 2. 初始化监听器
+        this.setupEventListeners();
+        
+        // 3. 订阅 Store 变更
+        Store.subscribe((key, value) => {
+            if (key === 'tree') {
+                this.renderASCIITree(value);
+                this.updateProjectStats(value);
+            }
+            if (key === 'isSidebarExpanded') {
+                this.toggleSidebar(value);
+            }
+        });
+
+        // 4. 初始化状态
+        this.renderASCIITree(Store.state.tree);
+        this.toggleSidebar(Store.state.isSidebarExpanded);
+    },
+
+    setupEventListeners() {
+        // 菜单切换
+        if (this.dom.btnMenu) {
+            this.dom.btnMenu.addEventListener('click', () => {
+                Store.state.isSidebarExpanded = !Store.state.isSidebarExpanded;
+            });
+        }
+
+        // 统计栏点击 -> 切换文件树弹窗
+        if (this.dom.projectStatsBtn && this.dom.treePopover) {
+            this.dom.projectStatsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.dom.treePopover.classList.toggle('hidden');
+            });
+
+            // 点击外部关闭弹窗
+            document.addEventListener('click', (e) => {
+                if (!this.dom.treePopover.classList.contains('hidden') && 
+                    !this.dom.treePopover.contains(e.target) && 
+                    !this.dom.projectStatsBtn.contains(e.target)) {
+                    this.dom.treePopover.classList.add('hidden');
+                }
+            });
+        }
+
+        // 文件树点击（事件委托）
+        if (this.dom.asciiContainer) {
+            this.dom.asciiContainer.addEventListener('click', (e) => this.handleTreeClick(e));
+        }
+
+        // 上传区域初始化
+        this.setupUploadZone(this.dom.uploadZoneSource, (files) => this.handleSourceFiles(files), true);
+        this.setupUploadZone(this.dom.btnMemoryView, (files) => this.handleContextUpload(files), false, '.txt');
+    },
+
+    toggleSidebar(isExpanded) {
+        if (!this.dom.sidebar) return;
+        if (isExpanded) this.dom.sidebar.classList.remove('collapsed');
+        else this.dom.sidebar.classList.add('collapsed');
+    },
+
+    // --- 核心逻辑: 文件树与统计 ---
+
+    updateProjectStats(tree) {
+        if (!tree || tree.length === 0) {
+            this.dom.statFilesEl.textContent = '0 Files';
+            this.dom.statTokensEl.textContent = '0 Tokens';
+            return;
+        }
+        const selectedFiles = tree.filter(n => n.type === 'file' && n.selected);
+        const count = selectedFiles.length;
+        
+        const totalBytes = selectedFiles.reduce((acc, node) => {
+            return acc + (node.file ? node.file.size : 0);
+        }, 0);
+        const estTokens = Math.ceil(totalBytes / 4);
+
+        this.dom.statFilesEl.textContent = `${count} Files`;
+        this.dom.statTokensEl.textContent = `~${estTokens.toLocaleString()} Tokens`;
+    },
+
+    renderASCIITree(tree) {
+        const container = this.dom.asciiContainer;
+        container.innerHTML = '';
+        
+        if (!tree || tree.length === 0) return; 
+        const fragment = document.createDocumentFragment();
+
+        tree.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = `tree-node ${item.type === 'dir' ? 'tree-node--folder' : 'tree-node--file'}`;
+            div.dataset.index = index;
+
+            if (!item.selected) {
+                div.classList.add('is-excluded');
+            }
+            
+            const labelClass = item.type === 'dir' ? 'node-label-folder' : 'node-label';
+            
+            const connectorSpan = document.createElement('span');
+            connectorSpan.className = 'tree-connector';
+            connectorSpan.textContent = `${item.prefix}${item.connector}`;
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = labelClass;
+            labelSpan.textContent = item.name;
+
+            div.appendChild(connectorSpan);
+            div.appendChild(labelSpan);
+            fragment.appendChild(div);
+        });
+        container.appendChild(fragment);
+    },
+
+    handleTreeClick(e) {
+        const target = e.target.closest('.tree-node');
+        if (!target) return;
+
+        const index = parseInt(target.dataset.index, 10);
+        if (isNaN(index)) return;
+
+        Store.toggleNodeSelection(index);
+    },
+    // --- 核心逻辑: 文件上传 ---
+
+    async handleSourceFiles(files) {
+        if (!files.length) return;
+        this.dom.asciiContainer.innerHTML = '<div style="padding:20px; color:var(--text-4);">Scanning files...</div>';
+
+        try {
+            const result = await ProjectCore.buildFileTree(files);
+            if (!result) return;
+            const flatTree = ProjectCore.flattenTree(result.root);
+            Store.setProject(result.projectName, flatTree);
+
+            if (!Store.state.isSidebarExpanded) {
+                Store.state.isSidebarExpanded = true;
+            }
+        } catch (error) {
+            console.error("File processing error:", error);
+            this.dom.asciiContainer.innerHTML = '<div style="padding:20px; color:var(--accent-red);">Error processing files.</div>';
+        }
+    },
+
+    async handleContextUpload(files) {
+        if (!files.length) return;
+        const file = files[0]; 
+        
+        try {
+            Store.state.contextContent = await ProjectCore.readFileContent(file);
+        } catch (e) {
+            console.error("Failed to read context file", e);
+            alert("Error reading context file");
+            return;
+        }
+
+        // 使用新方法更新历史记录
+        this.addContextHistory(file.name);
+
+        if (!Store.state.isSidebarExpanded && this.dom.btnMenu) {
+            this.dom.btnMenu.click();
+        }
+    },
+
+    // 新增：添加 Context 历史记录
+    addContextHistory(name) {
+        if (!this.dom.ctxHistoryList) return;
+
+        // 移除空状态
+        const emptyState = this.dom.ctxHistoryList.querySelector('.ctx-empty-state');
+        if (emptyState) emptyState.remove();
+
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+        const item = document.createElement('div');
+        item.className = 'ctx-history-item';
+        item.innerHTML = `
+            <span class="ctx-filename" title="${name}">${name}</span>
+            <span class="ctx-date">${timeStr}</span>
+        `;
+
+        // 插入到最前面
+        this.dom.ctxHistoryList.prepend(item);
+    },
+
+    setupUploadZone(zoneElement, handler, isDirectory = false, accept = '') {
+        if (!zoneElement) return;
+
+        zoneElement.addEventListener('click', () => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            if (accept) fileInput.accept = accept;
+            if (isDirectory) fileInput.webkitdirectory = true;
+            fileInput.multiple = isDirectory; 
+            fileInput.onchange = (e) => handler(e.target.files);
+            fileInput.click();
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            zoneElement.addEventListener(eventName, (e) => {
+                e.preventDefault(); 
+                e.stopPropagation();
+            }, false);
+        });
+
+        zoneElement.addEventListener('dragover', () => zoneElement.classList.add('drag-active'));
+        zoneElement.addEventListener('dragleave', () => zoneElement.classList.remove('drag-active'));
+        zoneElement.addEventListener('drop', (e) => {
+            zoneElement.classList.remove('drag-active');
+            handler(e.dataTransfer.files);
+        });
+    }
+};

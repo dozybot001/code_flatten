@@ -1,0 +1,41 @@
+这段文本包含两个修改：
+1.  在 `app.py` 中增加了一个乘法计算的调用。
+2.  在 `utils.py` 中将版本号从 1.0.0 升级到 2.0.0，并增加了乘法函数。
+
+```text
+Here are the updates for the calculator project:
+
+FILE: demo_project/app.py
+<<<<<<< SEARCH
+    result = utils.add(10, 5)
+    print(f"10 + 5 = {result}")
+
+if __name__ == "__main__":
+=======
+    result = utils.add(10, 5)
+    print(f"10 + 5 = {result}")
+
+    # Added multiplication demo
+    mult_res = utils.multiply(4, 4)
+    print(f"4 * 4 = {mult_res}")
+
+if __name__ == "__main__":
+>>>>>>> REPLACE
+
+FILE: demo_project/utils.py
+<<<<<<< SEARCH
+def get_version():
+    return "1.0.0"
+
+def add(a, b):
+=======
+def get_version():
+    return "2.0.0"
+
+def multiply(a, b):
+    return a * b
+
+def add(a, b):
+>>>>>>> REPLACE
+
+```

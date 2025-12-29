@@ -3,154 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unknown</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>AI Workspace - Gemini Clone</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div id="toast-overlay"></div>
-    <nav class="app-header">
-        <a href="https://github.com/dozybot001/AIchemy" class="ui-btn">GitHub</a>
-        <a href="https://dozybot001.github.io" class="ui-btn">Blog</a>
-        <button id="action-settings" class="ui-btn">⚙️</button> 
-    </nav>
-    <div class="layout-section">
-        <div class="hero-banner"><h1>Unknown</h1></div>
-    </div>
-    <div class="layout-section">
-        <div class="app-workspace">
-            <input type="file" id="input-upload-directory" class="hidden-input" webkitdirectory directory multiple>
-            <input type="file" id="input-upload-files" class="hidden-input" multiple>
-            <input type="file" id="input-upload-baseline" class="hidden-input" accept=".txt,text/plain">
 
-            <div class="gemini-hero-container">
-                <div class="gemini-input-wrapper">
-                    <input type="text" id="input-req-command" class="gemini-main-input" autocomplete="off">
-                    <button class="ui-btn" id="action-analyze-req">分析</button>
+    <aside id="sidebar" class="collapsed">
+        
+        <div class="sidebar-btn" id="btn-menu">
+            <span class="material-symbols-outlined">menu</span>
+            <span class="nav-text">WORKSPACE</span>
+        </div>
+            
+        <div class="sidebar-btn" id="upload-zone-source">
+            <span class="material-symbols-outlined">folder_open</span>
+            <span class="nav-text">Project Files</span>
+        </div>
+        
+        <div class="sidebar-group relative-container">
+            <div id="project-stats" class="project-stats-bar interactive" title="Click to view file tree">
+                <div class="stats-text-group">
+                    <span id="stat-files">0 Files</span>
+                    <span class="separator">·</span>
+                    <span id="stat-tokens">0 Tokens</span>
+                </div>
+                <span class="material-symbols-outlined arrow-indicator">chevron_right</span>
+            </div>
+
+            <div id="tree-popover" class="tree-popover hidden">
+                <div class="popover-header">Project Structure</div>
+                <div id="ascii-tree-view" class="ascii-tree-container"></div>
+            </div>
+        </div>
+
+        <div class="sidebar-btn" id="btn-merge">
+            <span class="material-symbols-outlined">call_merge</span>
+            <span class="nav-text">Merge Project</span>
+        </div>
+
+        <div class="sidebar-btn" id="btn-memory-view">
+            <span class="material-symbols-outlined">description</span>
+            <span class="nav-text">Context TXT</span>
+        </div>
+
+        <div id="context-info" class="context-history-container">
+            <div id="context-history-list" class="context-history-list">
+                <div class="ctx-empty-state">No context loaded</div>
+            </div>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-btn" id="btn-rebuild">
+                <span class="material-symbols-outlined">build</span>
+                <span class="nav-text">Rebuild Project</span>
+            </div>
+
+            <div class="sidebar-btn" id="btn-reset">
+                <span class="material-symbols-outlined">restart_alt</span>
+                <span class="nav-text">Reset Workspace</span>
+            </div>
+        </div>
+
+    </aside>
+
+    <main id="main-content">
+        <header class="chat-header">
+            <div class="header-left">
+                <button id="model-selector" class="model-selector-btn">
+                    <span class="nav-text" id="model-text">Gemini 1.5 Pro</span>
+                    <span class="material-symbols-outlined">expand_more</span>
+                </button>
+            </div>
+            <div class="header-right">
+                <button id="btn-settings-top" class="icon-btn-header">
+                    <span class="material-symbols-outlined">settings</span>
+                </button>
+            </div>
+        </header>
+
+        <div id="settings-modal" class="settings-modal hidden">
+            <div class="modal-content">
+                <div class="menu-item" id="btn-theme-toggle">
+                    <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+                    <span id="theme-text">Dark Mode</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="output-area" class="output-area">
+        </div>
+
+        <div class="input-wrapper centered" id="input-wrapper">
+            <div class="gemini-input-container">
+                <div id="input-files-area" class="input-files-area hidden"></div>
+                
+                <textarea id="main-input" placeholder="输入指令... (Shift+Enter 换行)" rows="1"></textarea>
+                
+                <div class="input-toolbar">
+                    <div class="toolbar-left">
+                        <button class="icon-btn-small" id="btn-input-upload" title="Upload file">
+                            <span class="material-symbols-outlined">add</span>
+                        </button>
+                        <div id="tag-container" class="toolbar-tag-container"></div>
+                    </div>
+                    
+                    <div class="toolbar-right">
+                        <button id="send-btn" class="send-btn-filled">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
-            <div class="ui-card" id="card-prompt-architect">
-                <div class="ui-card__header">
-                    <h2>Prompt 架构师</h2>
-                    <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-gen-prompt">生成 Prompt</button>
-                        <button class="ui-btn" id="action-copy-prompt">复制</button>
-                        <button class="ui-btn" id="action-reset-architect">🗑️</button>
-                    </div>
-                </div>
-                <div class="architect-container">
-                    <div id="container-req-options" class="architect-options-area hidden"></div>
-                    <div id="container-final-prompt" class="architect-result-area hidden">
-                        <div class="divider-line mb-3"></div>
-                        <textarea class="ui-editor-area auto-grow-textarea" id="output-architect-prompt" readonly></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ui-card">
-                <div class="ui-card__header">
-                    <h2>项目文件</h2>
-                    <div class="ui-stat-group">
-                        <span>文件数</span> <span class="ui-stat-value" id="display-file-count">0</span>
-                        <span>Token 估算</span> <span class="ui-stat-value" id="display-token-estimator">0</span>
-                    </div>
-                    <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-import-dir">加载项目</button>
-                        <button class="ui-btn" id="action-copy-structure">复制树</button>
-                        <button class="ui-btn" id="action-append-files">追加</button>
-                        <button class="ui-btn" id="action-select-all">全选</button>
-                        <button class="ui-btn" id="action-merge-content">合并</button> 
-                        <button class="ui-btn" id="action-reset-workspace">清空</button>
-                    </div>
-                </div>
-                <textarea class="ui-editor-area" id="viewer-file-tree"></textarea>
-            </div>
-
-            <div class="ui-card">
-                <div class="ui-card__header">
-                    <h2>合并预览</h2>
-                    <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-copy-result">复制</button>
-                        <button class="ui-btn" id="action-download-text">下载</button>
-                        <button class="ui-btn" id="action-clear-result">清空</button>
-                    </div>
-                </div>
-                <textarea class="ui-editor-area" id="editor-merge-result" readonly></textarea>
-            </div>
-
-            <div class="ui-card">
-                <div class="ui-card__header">
-                    <h2>粘贴补丁</h2>
-                    <div class="ui-stat-group">
-                        <span>基准文件</span> <span class="ui-stat-value" id="display-baseline-name">~</span>
-                    </div>
-                    <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-upload-baseline">上传基准文本</button>
-                        <button class="ui-btn" id="action-preview-patch">预览变更</button>
-                        <button class="ui-btn" id="action-clear-patch">清空</button>
-                    </div>
-                </div>
-                <textarea class="ui-editor-area" id="input-patch-source"></textarea>
-            </div>
-            
-            <div class="ui-card">
-                <div class="ui-card__header">
-                    <h2>变更预览</h2>
-                    <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-apply-download">应用 & 下载</button>
-                        <button class="ui-btn" id="action-apply-copy">应用 & 复制</button>
-                        <button class="ui-btn" id="action-clear-diff">清空</button>
-                    </div>
-                </div>
-                <div class="ui-editor-area diff-content-view" id="viewer-diff-result"></div>
-            </div>
-
-            <div class="ui-card">
-                <div class="ui-card__header">
-                    <h2>手动还原</h2>
-                    <div class="ui-toolbar">
-                        <button class="ui-btn" id="action-export-zip">打包下载</button> 
-                        <button class="ui-btn" id="btnClearRestore">清空</button>
-                    </div>
-                </div>
-                <textarea class="ui-editor-area" id="input-restore-source"></textarea>
+            <div class="mode-tags">
+                <button class="chip" data-type="Prompt">
+                    <span class="material-symbols-outlined">lightbulb</span> Prompt
+                </button>
+                <button class="chip" data-type="Patch">
+                    <span class="material-symbols-outlined">bug_report</span> Patch
+                </button>
             </div>
         </div>
-    </div>
-
-    <div id="modal-settings" class="modal-overlay hidden">
-        <div class="ui-card modal-content">
-            <div class="ui-card__header">
-                <h2>⚙️ 配置</h2>
-                <button class="ui-btn" id="action-close-settings">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>API Base URL</label>
-                    <input type="text" id="setting-base-url" class="ui-input" placeholder="例如: https://api.openai.com/v1">
-                </div>
-                <div class="form-group">
-                    <label>API Key</label>
-                    <input type="password" id="setting-api-key" class="ui-input">
-                </div>
-                <div class="form-group">
-                    <label>模型 Model</label>
-                    <input type="text" id="setting-model" class="ui-input" placeholder="例如: gpt-4o">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="ui-btn" id="action-save-settings">保存</button>
-            </div>
-        </div>
-    </div>
+    
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/core.js"></script>
-    <script src="js/app.js"></script>
+    <script type="module" src="ui-main.js"></script>
 </body>
 </html>

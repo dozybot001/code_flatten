@@ -1,0 +1,36 @@
+Project Tree:
+demo_project/
+├── app.py
+└── utils.py
+
+================================================
+
+=== File: demo_project/app.py ===
+```python
+import utils
+
+def main():
+    print("Starting Calculator App...")
+    print(f"Version: {utils.get_version()}")
+    
+    result = utils.add(10, 5)
+    print(f"10 + 5 = {result}")
+
+if __name__ == "__main__":
+    main()
+
+```
+
+=== File: demo_project/utils.py ===
+
+```python
+def get_version():
+    return "1.0.0"
+
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+```
