@@ -1,11 +1,11 @@
-@import 'css/theme.css';
-@import 'css/base.css';
-/* Layout & Global */
-@import 'css/layout.css';
-/* Components */
-@import 'css/components/sidebar.css';
-@import 'css/components/modal.css';
-@import 'css/components/button.css';
-@import 'css/components/chat.css';
-@import 'css/components/tree.css';
-@import 'css/components/diff.css';
+/* Main Entry Point */
+
+/* 1. 基础与布局公共类 */
+@import url('css/theme.css');
+@import url('css/base.css');
+
+/* 2. 各功能模块 */
+@import url('css/sidebar.css');  /* 侧边栏 (Left) */
+@import url('css/explorer.css'); /* 文件树 (Left-Panel) */
+@import url('css/editor.css');   /* 编辑器 (Center) */
+@import url('css/chat.css');     /* 聊天窗 (Right) */

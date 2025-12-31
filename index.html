@@ -4,196 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caret</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <aside id="sidebar" class="collapsed">
-        
-        <div class="sidebar-btn" id="btn-menu">
-            <span class="material-symbols-outlined">menu</span>
-            <span class="nav-text">WORKSPACE</span>
-        </div>
+    <div id="app">
+        <nav id="sidebar">
+            <div class="sidebar-top">
+                <div class="btn" id="btn-toggle-tree" title="Explorer">
+                    <i class="ph ph-files"></i>
+                </div>
+                <div class="btn" id="btn-open-folder" title="Open Folder">
+                    <i class="ph ph-folder-open"></i>
+                </div>
+                <div class="btn" id="btn-toggle-chat" title="AI Chat">
+                    <i class="ph ph-chat-circle-text"></i>
+                </div>
+            </div>
             
-        <div class="sidebar-btn" id="upload-zone-source">
-            <span class="material-symbols-outlined">folder_open</span>
-            <span class="nav-text">Project Files</span>
-        </div>
-        
-        <div class="sidebar-group relative-container">
-            <div id="project-stats" class="project-stats-bar interactive" title="Click to view file tree">
-                <div class="stats-text-group">
-                    <span id="stat-files">0 Files</span>
-                    <span class="separator">·</span>
-                    <span id="stat-tokens">0 Tokens</span>
+            <div class="sidebar-bottom">
+                <div class="btn" id="btn-settings" title="Settings">
+                    <i class="ph ph-gear"></i>
                 </div>
-                <span class="material-symbols-outlined arrow-indicator">chevron_right</span>
-            </div>
-
-            <div id="tree-popover" class="tree-popover hidden">
-                <div class="popover-header">Project Structure</div>
-                <div id="ascii-tree-view" class="ascii-tree-container"></div>
-            </div>
-        </div>
-
-        <div class="sidebar-btn" id="btn-merge">
-            <span class="material-symbols-outlined icon-flip">call_merge</span>
-            <span class="nav-text">Merge Project</span>
-        </div>
-
-        <div class="sidebar-btn" id="btn-memory-view">
-            <span class="material-symbols-outlined">description</span>
-            <span class="nav-text">Context TXT</span>
-        </div>
-
-        <div id="context-info" class="context-history-container">
-            <div id="context-history-list" class="context-history-list">
-                <div class="ctx-empty-state">No context loaded</div>
-            </div>
-        </div>
-
-        <div class="sidebar-bottom">
-            <div class="sidebar-btn" id="btn-rebuild">
-                <span class="material-symbols-outlined">build</span>
-                <span class="nav-text">Rebuild Project</span>
-            </div>
-
-            <div class="sidebar-btn" id="btn-reset">
-                <span class="material-symbols-outlined">restart_alt</span>
-                <span class="nav-text">Reset Workspace</span>
-            </div>
-        </div>
-
-    </aside>
-
-    <main id="main-content">
-        <header class="chat-header">
-            <div class="header-left" style="position: relative;">
-                <button id="model-selector" class="model-selector-btn">
-                    <span class="nav-text" id="model-text">Gemini 1.5 Pro</span>
-                    <span class="material-symbols-outlined">expand_more</span>
-                </button>
-                
-                <div id="model-menu" class="model-menu hidden">
-                    <div class="menu-item model-option" data-value="Gemini 1.5 Pro">
-                        <span>Gemini 1.5 Pro</span>
+                <div id="settings-menu" class="popup-menu hidden">
+                    <div class="menu-item" id="menu-item-api">
+                        <span>API Configuration</span>
+                        <i class="ph ph-caret-right"></i>
                     </div>
-                    <div class="menu-item model-option" data-value="Gemini 1.5 Flash">
-                        <span>Gemini 1.5 Flash</span>
-                    </div>
-                    <div class="menu-item model-option" data-value="Gemini Ultra">
-                        <span>Gemini Ultra</span>
-                    </div>
-                    <div class="separator-line" style="height: 1px; background: var(--gray-l3); margin: 4px 0;"></div>
-                    <div class="menu-item model-option" data-value="Custom API">
-                        <span>Use Custom API</span>
+                </div>
+                <div id="api-config-modal" class="popup-menu hidden">
+                    <div class="menu-header">API Settings</div>
+                    <div class="menu-content" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="input-group">
+                            <label>Base URL</label>
+                            <input id="input-base-url" type="text" placeholder="https://api." />
+                        </div>
+                        <div class="input-group">
+                            <label>API Key</label>
+                            <input id="input-api-key" type="password" placeholder="sk-..." />
+                        </div>
+                        <div class="input-group">
+                            <label>Model Name</label>
+                            <input id="input-model-name" type="text" placeholder="deepseek" />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="header-right" style="display:flex; align-items:center; gap:8px;">
-                <div style="position: relative;">
-                    <button id="btn-utils-top" class="icon-btn-header" title="Utilities">
-                        <span class="material-symbols-outlined">construction</span>
-                    </button>
-                    <div id="utils-menu" class="model-menu hidden" style="right: 0; left: auto; width: 220px; transform-origin: top right;">
-                        <div class="menu-item model-option" id="util-clean-context">
-                            <span class="material-symbols-outlined">cleaning_services</span>
-                            <span>Remove Comments</span>
+        </nav>
+
+        <aside id="file-tree-panel">
+            <div id="pending-changes-panel" class="hidden">
+                <div class="pending-header">
+                    <span>PENDING CHANGES</span>
+                    <span id="pending-count" class="badge">0</span>
+                </div>
+                <div id="pending-list"></div>
+            </div>
+            <div id="file-tree"></div> 
+        </aside>
+
+        <main id="editor-area">
+            <div id="tabs-bar"></div>
+            <div id="monaco-container"></div>
+        </main>
+
+        <aside id="chat-panel" class="collapsed">
+            <div class="panel-header" style="justify-content: space-between; padding-left: 15px;">
+                <div class="model-selector-wrapper">
+                    <div id="current-model-display" class="model-display">
+                        <i class="ph ph-robot"></i>
+                        <span id="model-name-text">Loading...</span>
+                        <i class="ph ph-caret-down"></i>
+                    </div>
+                    <div id="model-menu" class="popup-menu hidden">
+                        <div class="menu-header" style="font-size: 11px; color: #666; padding: 4px 8px;">Switch Model</div>
+                        <div class="menu-item" id="menu-item-custom-api">
+                            <i class="ph ph-sliders" style="margin-right: 8px;"></i>
+                            <span>Use Custom API</span>
                         </div>
                     </div>
                 </div>
 
-                <button id="btn-settings-top" class="icon-btn-header">
-                    <span class="material-symbols-outlined">settings</span>
+                <div class="header-actions">
+                    <button id="btn-show-map" class="btn" title="Repo Map">
+                        <i class="ph ph-map-trifold"></i>
+                    </button>
+                    <button id="btn-clear-chat" class="btn" title="Clear Chat">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="chat-messages"></div>
+            <div id="chat-input-area">
+                <textarea id="chat-input" placeholder="Type a message..."></textarea>
+                <button id="btn-send-chat" class="btn">
+                    <i class="ph ph-arrow-up"></i>
                 </button>
             </div>
-        </header>
-
-        <div id="settings-modal" class="settings-modal hidden">
-            <div class="modal-content">
-                <div class="menu-item" id="btn-theme-toggle">
-                    <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
-                    <span id="theme-text">Dark Mode</span>
-                </div>
-                <div class="menu-item" id="btn-api-settings">
-                    <span class="material-symbols-outlined">settings_ethernet</span>
-                    <span>API Config</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="api-modal" class="modal-overlay hidden">
-            <div class="api-modal-card">
-                <div class="api-modal-header">
-                    <h3>API Configuration</h3>
-                    <button id="btn-close-api" class="icon-btn-small"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="api-form">
-                    <div class="form-group">
-                        <label>Base URL</label>
-                        <input type="text" id="api-base-url" placeholder="https://api.openai.com/v1" />
-                    </div>
-                    <div class="form-group">
-                        <label>API Key</label>
-                        <input type="password" id="api-key" placeholder="sk-..." />
-                    </div>
-                    <div class="form-group">
-                        <label>Model Name</label>
-                        <input type="text" id="api-model" placeholder="gpt-4" />
-                    </div>
-                    <div class="form-actions">
-                        <button id="btn-save-api" class="btn-primary">Save Configuration</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="output-area" class="output-area">
-        </div>
-
-        <div class="input-wrapper centered" id="input-wrapper">
-            <div class="gemini-input-container">
-                <div id="input-files-area" class="input-files-area hidden"></div>
-                
-                <textarea id="main-input" placeholder="输入指令... (Shift+Enter 换行)" rows="1"></textarea>
-                
-                <div class="input-toolbar">
-                    <div class="toolbar-left">
-                        <button class="icon-btn-small" id="btn-input-upload" title="Upload file">
-                            <span class="material-symbols-outlined">add</span>
-                        </button>
-                        <div id="tag-container" class="toolbar-tag-container"></div>
-                    </div>
-                    
-                    <div class="toolbar-right">
-                        <button id="send-btn" class="send-btn-filled">
-                            <span class="material-symbols-outlined">send</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mode-tags">
-                <button class="chip" data-type="Prompt">
-                    <span class="material-symbols-outlined">lightbulb</span> Prompt
-                </button>
-                <button class="chip" data-type="Patch">
-                    <span class="material-symbols-outlined">bug_report</span> Patch
-                </button>
-            </div>
-        </div>
+        </aside>
+    </div>
     
-    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script src="https://unpkg.com/web-tree-sitter@0.20.8/tree-sitter.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    
-    <script type="module" src="app.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>

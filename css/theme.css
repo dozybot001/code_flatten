@@ -1,65 +1,22 @@
 :root {
-    /* --- Base Grayscale (Dark Mode) --- */
-    /* 阶梯策略：每级亮度大约增加 8-10% */
     
-    --gray-l1: #0F0F10;      /* Main BG: 保持深邃 */
-    --gray-l2: #1A1A1D;      /* Sidebar: 与 L1 拉开距离 (#1A vs #0F) */
-    --gray-l3: #27272A;      /* Cards/Hover: 与 L2 明显区分 (#27 vs #1A) */
-    --gray-l4: #363639;      /* Borders: 更亮，作为边界 (#36) */
-    --gray-l5: #454548;      /* Accents: 最亮 (#45) */
-    
-    /* --- Text Levels --- */
-    --text-1: #F0F2F5;
-    --text-2: #D1D4D8;
-    --text-3: #9FA2A6;
-    --text-4: #6E7175;
-    --text-5: #444746;
-    
-    /* State Colors (Unchanged) */
-    --state-error-text: #FFB4AB;
-    --state-error-bg:   rgba(65, 14, 11, 0.4);
-    --state-warn-text:  #E5D386; 
-    --state-warn-bg:    rgba(60, 50, 10, 0.4);
-    --state-success-text: #B7F397;
-    --state-success-bg:   rgba(18, 55, 30, 0.4);
+    /* Background Levels (1-5) - 拉开对比度 */
+    --bg-1: #101010; /* [Level 1] Deepest: 编辑器/主内容区 (沉浸黑) */
+    --bg-2: #181818; /* [Level 2] Secondary: 文件树/Chat面板 (深灰) */
+    --bg-3: #222222; /* [Level 3] Tertiary: 侧边栏/Popup (中灰) */
+    --bg-4: #303030; /* [Level 4] Elements: 输入框/按钮/Tab背景 */
+    --bg-5: #454545; /* [Level 5] Active: 选中状态/Hover高亮 */
 
-    /* Misc (Unchanged) */
-    --sidebar-collapsed: 72px; 
-    --sidebar-expanded: 260px;
-    --gemini-ease: cubic-bezier(0.2, 0, 0, 1);
-    --scrollbar-track: transparent; 
-    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --scrollbar-thumb: var(--gray-l4); 
-}
+    /* Text Levels (1-5) */
+    --text-1: #eeeeee; /* Primary */
+    --text-2: #b0b0b0; /* Secondary */
+    --text-3: #777777; /* Tertiary/Placeholder */
+    --text-4: #555555; /* Disabled */
+    --text-5: #333333; /* Inverse/Dark */
 
-/* --- Light Theme Override --- */
-[data-theme="light"] {
-    /* --- Base Grayscale (Light Mode) --- */
-    /* 阶梯策略：逐级加深灰度 */
-    
-    --gray-l1: #FFFFFF;      /* Main BG: 纯白 */
-    --gray-l2: #F0F2F5;      /* Sidebar: 常见的浅灰，与白底区分清晰 */
-    --gray-l3: #E3E6EA;      /* Cards/Hover: 比 L2 明显深一级 */
-    --gray-l4: #D3D7DC;      /* Borders: 清晰的边框灰 */
-    --gray-l5: #B0B5BA;      /* Accents: 深灰装饰 */
-    
-    /* --- Text Levels (Unchanged) --- */
-    --text-1: #1F1F1F;       
-    --text-2: #444746;       
-    --text-3: #5E5E5E;       
-    --text-4: #767676;       
-    --text-5: #9AA0A6;       
-    
-    /* State Colors (Unchanged) */
-    --state-error-text: #B3261E;
-    --state-error-bg:   rgba(179, 38, 30, 0.1);
-    --state-warn-text:  #856404; 
-    --state-warn-bg:    rgba(133, 100, 4, 0.1);
-    --state-success-text: #146C2E;
-    --state-success-bg:   rgba(20, 108, 46, 0.1);
-
-    /* Misc (Unchanged) */
-    --scrollbar-track: #FFFFFF;
-    --scrollbar-thumb: #C4C7C5; 
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08); 
+    /* Dimensions */
+    --sidebar-width: 50px;
+    --tree-width: 260px;
+    --chat-width: 340px;
+    --tab-height: 36px;
 }

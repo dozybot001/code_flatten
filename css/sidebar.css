@@ -1,0 +1,47 @@
+/* =========================================
+   Sidebar Area
+   ========================================= */
+
+#sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    z-index: 10;
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* 设置菜单位置 */
+#settings-menu {
+    left: 100%;
+    bottom: 0;
+    margin-left: 10px;
+}
+
+/* API 配置模态框位置 */
+#api-config-modal {
+    left: calc(100% + 175px); 
+    bottom: 0;
+    width: 280px;
+    padding: 12px;
+    cursor: default;
+}
